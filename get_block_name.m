@@ -1,0 +1,49 @@
+function [f, args]  = get_block_name(SUBJ, YYYY, MM, DD, ARRAY, BLOCK, varargin)
+%GET_BLOCK_NAME  Return the string info corresponding to a given block
+%
+% Syntax:
+%   f = utils.get_block_name(SUBJ, YYYY, MM, DD, ARRAY, BLOCK);
+%   [f, args] = utils.get_block_name(__, 'Name', value, ...);
+%
+% Inputs:
+%   SUBJ  - Subject name (e.g. 'Frank' or "Frank")
+%   YYYY  - Year (numeric or string, e.g. 2021 or "2021" or '2021')
+%   MM    - Month (numeric or string, e.g. 11 or "11" or '11')
+%   DD    - Day   (numeric or string, e.g. 18 or "18" or '18')
+%   ARRAY - "A" or "B" (or 'A' or 'B') or ["A", "B"] or {'A', 'B'}
+%   BLOCK - Recording parameter key (block; numeric or string, e.g. 0 or "0")
+%   varargin - (Optional) -- 'Name', value pairs
+%
+% Output:
+%   f     - Filename struct with fields for 'Tank', 'Block' etc.
+%   args  - Cell format of input args (SUBJ - BLOCK) to make it convenient
+%           to pass them to other functions.
+%
+% See also: Contents, utils
+
+pars = struct;
+[pars.rootdir_raw, pars.rootdir_gen] = utils.parameters('raw_data_folder', 'generated_data_folder');
+pars = utils.parse_parameters(pars, varargin{:});
+
+[YYYY, MM, DD] = utils.parse_date_args(YYYY, MM, DD);
+
+tank = string(sprintf('%s_%04d_%02d_%02d', SUBJ, YYYY, MM, DD));
+block = string(sprintf('%s_%s_%d', tank, ARRAY, BLOCK));
+
+f = struct;
+f.Date = string(sprintf('%04d_%02d_%02d', YYYY, MM, DD));
+f.DateValue = datetime(YYYY, MM, DD);
+f.Animal = SUBJ;
+f.Tank = tank;
+f.Block = block;
+f.Raw.Subj = fullfile(pars.rootdir_raw, SUBJ);
+f.Raw.Tank = fullfile(pars.rootdir_raw, SUBJ, tank);
+f.Raw.Block = fullfile(pars.rootdir_raw, SUBJ, tank, block);
+f.Generated.Subj = fullfile(pars.rootdir_gen, SUBJ);
+f.Generated.Tank = fullfile(pars.rootdir_gen, SUBJ, tank);
+f.Generated.Block = fullfile(pars.rootdir_gen, SUBJ, tank, num2str(BLOCK));
+
+if nargout > 1
+    args = {SUBJ, YYYY, MM, DD, ARRAY, BLOCK}; 
+end
+end

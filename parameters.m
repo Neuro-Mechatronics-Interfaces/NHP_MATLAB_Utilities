@@ -18,11 +18,13 @@ function varargout = parameters(varargin)
 pars = struct;
 
 % % % Trying to pull the "relevant" ones to the top ... % % % 
-pars.generated_data_folder = 'R:\NMLShare\generated_data\primate\DARPA_N3\N3_Patch';
-pars.preliminary_output_folder = fullfile(pars.generated_data_folder, '.preliminary'); % . prefix defaults to "Hidden" on Windows
 pars.raw_data_folder = 'R:\NMLShare\raw_data\primate';
+pars.generated_data_folder = 'R:\NMLShare\generated_data\primate\TC';
+pars.preliminary_output_folder = fullfile(pars.generated_data_folder, '.preliminary'); % . prefix defaults to "Hidden" on Windows
 pars.default_training_log_file = 'G:\Shared drives\NML_NHP\Monkey Training Records\Training.xlsx';
-pars.default_metadata_file = 'R:\NMLShare\raw_data\primate\Forrest\metadata.xlsx';
+pars.task_bits_file = "wrist_task_bits.json";
+pars.raw_matfiles_folder = ".raw_channels";
+pars.raw_matfiles_expr = "%s_RAW_%%d.mat";
 pars.version = 1.0; % "Version" of utils/parameter repo code
 
 N = numel(varargin);
