@@ -25,6 +25,8 @@ pars.default_training_log_file = 'G:\Shared drives\NML_NHP\Monkey Training Recor
 pars.task_bits_file = "wrist_task_bits.json";
 pars.raw_matfiles_folder = ".raw_channels";
 pars.raw_matfiles_expr = "%s_RAW_%%d.mat";
+pars.events_file_expr = "%s_EVENTS.mat";
+pars.meta_file_expr = "%s_META.mat";
 pars.version = 1.0; % "Version" of utils/parameter repo code
 
 N = numel(varargin);
