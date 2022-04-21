@@ -23,11 +23,23 @@ pars.generated_data_folder = 'R:\NMLShare\generated_data\primate\TC';
 pars.preliminary_output_folder = fullfile(pars.generated_data_folder, '.preliminary'); % . prefix defaults to "Hidden" on Windows
 pars.default_training_log_file = 'G:\Shared drives\NML_NHP\Monkey Training Records\Training.xlsx';
 pars.task_bits_file = "wrist_task_bits.json";
+pars.channels_spreadsheet_expr = "%s_CHANNELS.xlsx";
+pars.events_spreadsheet_expr = "%s_EVENTS.xlsx";
 pars.raw_matfiles_folder = ".raw_channels";
 pars.raw_matfiles_expr = "%s_RAW_%%d.mat";
 pars.events_file_expr = "%s_EVENTS.mat";
 pars.meta_file_expr = "%s_META.mat";
-pars.version = 1.0; % "Version" of utils/parameter repo code
+pars.alignment_parent_folder = ".aligned";
+pars.alignment_folder = struct( ...
+    'MOVE_ONSET', ".move", ...
+    'T1_HOLD_ONSET', ".t1", ...
+    'T2_HOLD_ONSET', ".t2", ...
+    'OVERSHOOT_ONSET', ".overshoot", ...
+    'REWARD_ONSET', ".reward");
+pars.mongo.server = "localhost";
+pars.mongo.port = 27017;
+pars.mongo.dbname = "wrist";
+pars.version = 2.0; % "Version" of utils/parameter repo code
 
 N = numel(varargin);
 if nargout == 1

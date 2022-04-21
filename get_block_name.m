@@ -22,7 +22,12 @@ function [f, args]  = get_block_name(SUBJ, YYYY, MM, DD, ARRAY, BLOCK, varargin)
 % See also: Contents, utils
 
 pars = struct;
-[pars.rootdir_raw, pars.rootdir_gen] = utils.parameters('raw_data_folder', 'generated_data_folder');
+[pars.rootdir_raw, pars.rootdir_gen, ...
+    pars.raw_matfiles_folder, pars.meta_file_expr, pars.events_file_expr, ...
+    pars.alignment_parent_folder, pars.alignment_folder] = ...
+    utils.parameters('raw_data_folder', 'generated_data_folder', ...
+        'raw_matfiles_folder', 'meta_file_expr', 'events_file_expr', ...
+        'alignment_parent_folder', 'alignment_folder');
 pars = utils.parse_parameters(pars, varargin{:});
 
 [YYYY, MM, DD] = utils.parse_date_args(YYYY, MM, DD);
@@ -42,6 +47,14 @@ f.Raw.Block = fullfile(pars.rootdir_raw, SUBJ, tank, block);
 f.Generated.Subj = fullfile(pars.rootdir_gen, SUBJ);
 f.Generated.Tank = fullfile(pars.rootdir_gen, SUBJ, tank);
 f.Generated.Block = fullfile(pars.rootdir_gen, SUBJ, tank, num2str(BLOCK));
+f.Generated.Channels = fullfile(f.Generated.Block, pars.raw_matfiles_folder);
+f.Generated.Aligned = struct;
+F = fieldnames(pars.alignment_folder);
+for iF = 1:numel(F)
+    f.Generated.Aligned.(F{iF}) = fullfile(f.Generated.Block, pars.alignment_parent_folder, pars.alignment_folder.(F{iF})); 
+end
+f.Generated.Events = fullfile(f.Generated.Block, sprintf(pars.events_file_expr, f.Block));
+f.Generated.Meta = fullfile(f.Generated.Block, sprintf(pars.meta_file_expr, f.Block));
 
 if nargout > 1
     args = {SUBJ, YYYY, MM, DD, ARRAY, BLOCK}; 
