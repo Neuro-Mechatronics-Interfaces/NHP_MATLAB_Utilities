@@ -23,5 +23,5 @@
 %   get_block_name                     - Return the string info corresponding to a given block
 %   print_timing_info                  - Prints total time for a given function to run.
 %   print_windows_folder_link          - Print or return string to link to windows folder(s)
+%   sba_patch_2_struct                 - Convenience function to convert patch handle to struct
 %   showModelInfo                      - Print model info and optionally make figure for covariances
-
