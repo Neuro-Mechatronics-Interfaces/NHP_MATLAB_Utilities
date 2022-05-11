@@ -85,7 +85,7 @@ offset = find([diff(sync_data) > 0, false]);
 
 if nargin > 2
     out_path = varargin{3};
-    save_output = true && isa(data, 'TMSiSAGA.Data');
+    save_output = true && (isa(data, 'TMSiSAGA.Data') || isa(data, 'struct'));
 end
 
 if save_output
