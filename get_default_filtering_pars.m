@@ -89,6 +89,6 @@ filtering.Name = filter_type;
 filtering.System = acquisition_system;
 filtering.Type = data_type;
 
-filtering = parse_parameters(filtering, varargin{:});
+filtering = utils.parse_parameters(filtering, varargin{:});
 
 end
