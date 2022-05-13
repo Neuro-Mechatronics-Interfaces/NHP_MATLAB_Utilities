@@ -35,7 +35,9 @@ function [z, fs, filtering] = apply_emg_filters(x, filtering, fs, trigs, stops)
 if isstruct(x) || isa(x, 'TMSiSAGA.Data')
     fs = x.sample_rate;
     if ismember(filtering.Type, ["Array", "RMS"])
-        x = x.samples(1:64, :)';
+        b = horzcat(x.channels{:});
+        x = x.samples(contains({b.alternative_name}, 'UNI'), :)';
+        %x = x.samples(1:64, :)';
     else
         c = horzcat(x.channels{:});
         x = x.samples(contains({c.alternative_name}, 'BIP'), :)';
