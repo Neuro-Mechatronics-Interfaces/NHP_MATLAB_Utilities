@@ -11,6 +11,7 @@
 %   SNEO                               - Returns the smoothed nonlinear energy operator (SNEO) for signal X
 %
 % Parsers
+%   tmsi_folder_2_datetime             - Convert TMSi folder timestring to datetime
 %   tmsi_header_2_datetime             - Convert TMSi header start_time field to datetime
 %   parse_date_args                    - Parse date input arguments
 %   parse_bit_sync                     - Outputs a vector of trigger events that match up with the bit value from sync_bit. Accepts either a struct or vector
