@@ -13,11 +13,9 @@ function dt = tmsi_header_2_datetime(h)
 %
 % See also: Contents
 
-ts = h.start_time(1:6)';
-ts(6) = ts(6) + h.start_time(7).*1e-3;
-ts(4) = ts(4) + 9; % Account for offset from different timezones.
+ts = h.start_time([1:3, 5:7])';
 dt = datetime(ts, ...
-    'Format', 'yyyy-MM-dd HH:mm:ss.SSS', ...
+    'Format', 'uuuu-MM-dd HH:mm:ss.SSSS', ...
     'TimeZone', 'America/New_York');
 
 end
