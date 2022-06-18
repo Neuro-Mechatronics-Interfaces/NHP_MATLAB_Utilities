@@ -19,7 +19,7 @@ function [f, args]  = get_block_name(SUBJ, YYYY, MM, DD, ARRAY, BLOCK, varargin)
 %   args  - Cell format of input args (SUBJ - BLOCK) to make it convenient
 %           to pass them to other functions.
 %
-% See also: Contents, utils
+% See also: Contents, utils, utils.get_subj_query
 
 if (numel(varargin)==1) && isstruct(varargin{1})
     pars = varargin{1};
@@ -74,6 +74,7 @@ f.Generated.Subj = fullfile(pars.rootdir_gen, SUBJ);
 f.Generated.Tank = fullfile(pars.rootdir_gen, SUBJ, tank);
 f.Generated.Block = fullfile(pars.rootdir_gen, SUBJ, tank, num2str(BLOCK));
 f.Generated.Channels = fullfile(f.Generated.Block, pars.raw_matfiles_folder);
+f.Generated.Config = fullfile(f.Generated.Block, "config.json");
 f.Generated.Aligned = struct;
 F = fieldnames(pars.alignment_folder);
 for iF = 1:numel(F)
