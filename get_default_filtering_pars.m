@@ -52,14 +52,14 @@ opts.TMSi.RMS.Name = "Rectified";                       % Can be: "Raw" | "Recti
 opts.TMSi.RMS.Add_To_Plots = true;                      % Add to plot?
 opts.TMSi.RMS.Apply_HPF = true;                         % Apply high-pass filter to the data?
 opts.TMSi.RMS.Apply_Max_Rescale = false;                % Apply rescaling using maximum value on per-channel basis?
-opts.TMSi.RMS.Apply_Polynomial_Detrend = true;          % Apply polynomial detrending to the data?
+opts.TMSi.RMS.Apply_Polynomial_Detrend = false;         % Apply polynomial detrending to the data?
 opts.TMSi.RMS.Apply_Stim_Blanking = false;              % Apply stimulation artifact blanking to the data?
 opts.TMSi.RMS.Stim_Blanking_Epoch = [-4 8];             % Samples to blank around stim onset and offset sample, respectively.
 opts.TMSi.RMS.Pre_Blanking_HPF_Order = 1;               % Order of pre-blanking DC bias removal filter order
 opts.TMSi.RMS.Pre_Blanking_HPF_Cutoff_Frequency = 15;   % Pre-blanking DC bias removal filter cutoff
 opts.TMSi.RMS.Apply_Virtual_Reference = true;           % Apply virtual common average subtraction?
-opts.TMSi.RMS.HPF_Order = 4;                            % Butterworth filter order for High-pass filter
-opts.TMSi.RMS.HPF_Cutoff_Frequency = 150;               % Cutoff frequency for High-pass filter
+opts.TMSi.RMS.HPF_Order = 2;                            % Butterworth filter order for High-pass filter
+opts.TMSi.RMS.HPF_Cutoff_Frequency = 2;                 % Cutoff frequency for High-pass filter
 opts.TMSi.RMS.Polynomial_Detrend_Order = 7;             % If this is NaN, auto-compute polynomial detrend order from number of triggers. Otherwise, use a specified polynomial fit to detrend data.
 
 

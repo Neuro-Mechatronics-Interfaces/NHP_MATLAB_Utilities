@@ -18,7 +18,7 @@ function stim = get_tmsi_stim_data(SUBJ, YYYY, MM, DD, ARRAY, BLOCK, raw_data_fo
 %   stim - Struct containing stimulation info
 
 if nargin < 7
-    raw_data_folder = 'R:/NMLShare/raw_data/primate'; 
+    raw_data_folder = parameters('raw_data_folder'); 
 end
 
 tank = sprintf('%s_%04d_%02d_%02d', SUBJ, YYYY, MM, DD); % data "tank"
