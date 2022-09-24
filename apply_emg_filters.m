@@ -147,7 +147,11 @@ end
 
 % Apply HPF
 if filtering.Apply_HPF
-    [b, a] = butter(filtering.HPF_Order, filtering.HPF_Cutoff_Frequency / (fs / 2), 'high');
+    if numel(filtering.HPF_Cutoff_Frequency) == 2
+        [b, a] = butter(filtering.HPF_Order, filtering.HPF_Cutoff_Frequency / (fs / 2), 'bandpass');
+    else
+        [b, a] = butter(filtering.HPF_Order, filtering.HPF_Cutoff_Frequency / (fs / 2), 'high');
+    end
     data_in = filter(b, a, data_in)'; % Flip back to nChannels x nSamples.
 else
     data_in = data_in'; % Flip back to nChannels x nSamples. 

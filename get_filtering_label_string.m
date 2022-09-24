@@ -13,22 +13,46 @@ function str = get_filtering_label_string(filtering)
 % See also: Contents, get_default_filtering_pars
 
 if filtering.Apply_HPF && filtering.Apply_Polynomial_Detrend && filtering.Apply_Virtual_Reference
-    if strcmpi(filtering.Name, 'raw')
-        str = char(sprintf('Detrend (poly = %d) + HPF (Ord = %d | Fc = %.6g) + VRef', filtering.Polynomial_Detrend_Order, filtering.HPF_Order, filtering.HPF_Cutoff_Frequency));
+    if numel(filtering.HPF_Cutoff_Frequency) == 2
+        if strcmpi(filtering.Name, 'raw')
+            str = char(sprintf('Detrend (poly = %d) + BPF (Ord = %d | Fc = [%.6g %.6g]) + VRef', filtering.Polynomial_Detrend_Order, filtering.HPF_Order, filtering.HPF_Cutoff_Frequency(1), filtering.HPF_Cutoff_Frequency(2)));
+        else
+            str = char(sprintf('Detrend (poly = %d) + BPF (Ord = %d | Fc = [%.6g %.6g]) + VRef + %s', filtering.Polynomial_Detrend_Order, filtering.HPF_Order, filtering.HPF_Cutoff_Frequency(1), filtering.HPF_Cutoff_Frequency(2), filtering.Name));
+        end
     else
-        str = char(sprintf('Detrend (poly = %d) + HPF (Ord = %d | Fc = %.6g) + VRef + %s', filtering.Polynomial_Detrend_Order, filtering.HPF_Order, filtering.HPF_Cutoff_Frequency, filtering.Name));
+        if strcmpi(filtering.Name, 'raw')
+            str = char(sprintf('Detrend (poly = %d) + HPF (Ord = %d | Fc = %.6g) + VRef', filtering.Polynomial_Detrend_Order, filtering.HPF_Order, filtering.HPF_Cutoff_Frequency));
+        else
+            str = char(sprintf('Detrend (poly = %d) + HPF (Ord = %d | Fc = %.6g) + VRef + %s', filtering.Polynomial_Detrend_Order, filtering.HPF_Order, filtering.HPF_Cutoff_Frequency, filtering.Name));
+        end
     end
 elseif filtering.Apply_HPF && filtering.Apply_Polynomial_Detrend
-    if strcmpi(filtering.Name, 'raw')
-        str = char(sprintf('Detrend (poly = %d) + HPF (Ord = %d | Fc = %.6g)', filtering.Polynomial_Detrend_Order, filtering.HPF_Order, filtering.HPF_Cutoff_Frequency));
+    if numel(filtering.HPF_Cutoff_Frequency) == 2
+        if strcmpi(filtering.Name, 'raw')
+            str = char(sprintf('Detrend (poly = %d) + BPF (Ord = %d | Fc = [%.6g %.6g])', filtering.Polynomial_Detrend_Order, filtering.HPF_Order, filtering.HPF_Cutoff_Frequency(1), filtering.HPF_Cutoff_Frequency(2)));
+        else
+            str = char(sprintf('Detrend (poly = %d) + BPF (Ord = %d | Fc = [%.6g %.6g]) + %s', filtering.Polynomial_Detrend_Order, filtering.HPF_Order, filtering.HPF_Cutoff_Frequency(1), filtering.HPF_Cutoff_Frequency(2), filtering.Name));
+        end
     else
-        str = char(sprintf('Detrend (poly = %d) + HPF (Ord = %d | Fc = %.6g) + %s', filtering.Polynomial_Detrend_Order, filtering.HPF_Order, filtering.HPF_Cutoff_Frequency, filtering.Name));
+        if strcmpi(filtering.Name, 'raw')
+            str = char(sprintf('Detrend (poly = %d) + HPF (Ord = %d | Fc = %.6g)', filtering.Polynomial_Detrend_Order, filtering.HPF_Order, filtering.HPF_Cutoff_Frequency));
+        else
+            str = char(sprintf('Detrend (poly = %d) + HPF (Ord = %d | Fc = %.6g) + %s', filtering.Polynomial_Detrend_Order, filtering.HPF_Order, filtering.HPF_Cutoff_Frequency, filtering.Name));
+        end
     end
 elseif filtering.Apply_HPF && filtering.Apply_Virtual_Reference
-    if strcmpi(filtering.Name, 'raw')
-        str = char(sprintf('HPF (Ord = %d | Fc = %.6g) + VRef', filtering.HPF_Order, filtering.HPF_Cutoff_Frequency));
+    if numel(HPF_Cutoff_Frequency) == 2
+        if strcmpi(filtering.Name, 'raw')
+            str = char(sprintf('BPF (Ord = %d | Fc = [%.6g %.6g]) + VRef', filtering.HPF_Order, filtering.HPF_Cutoff_Frequency(1), filtering.HPF_Cutoff_Frequency(2)));
+        else
+            str = char(sprintf('BPF (Ord = %d | Fc = [%.6g %.6g]) + VRef + %s', filtering.HPF_Order, filtering.HPF_Cutoff_Frequency(1), filtering.HPF_Cutoff_Frequency(2), filtering.Name));
+        end
     else
-        str = char(sprintf('HPF (Ord = %d | Fc = %.6g) + VRef + %s', filtering.HPF_Order, filtering.HPF_Cutoff_Frequency, filtering.Name));
+        if strcmpi(filtering.Name, 'raw')
+            str = char(sprintf('HPF (Ord = %d | Fc = %.6g) + VRef', filtering.HPF_Order, filtering.HPF_Cutoff_Frequency));
+        else
+            str = char(sprintf('HPF (Ord = %d | Fc = %.6g) + VRef + %s', filtering.HPF_Order, filtering.HPF_Cutoff_Frequency, filtering.Name));
+        end
     end
 elseif filtering.Apply_Polynomial_Detrend && filtering.Apply_Virtual_Reference
     if strcmpi(filtering.Name, 'raw')
@@ -37,10 +61,18 @@ elseif filtering.Apply_Polynomial_Detrend && filtering.Apply_Virtual_Reference
         str = char(sprintf('Detrend (poly = %d) + VRef + %s', filtering.Polynomial_Detrend_Order, filtering.Name));
     end
 elseif filtering.Apply_HPF
-    if strcmpi(filtering.Name, 'raw')
-        str = char(sprintf('HPF (Ord = %d | Fc = %.6g)', filtering.HPF_Order, filtering.HPF_Cutoff_Frequency));
+    if numel(filtering.HPF_Cutoff_Frequency) == 2
+        if strcmpi(filtering.Name, 'raw')
+            str = char(sprintf('BPF (Ord = %d | Fc = [%.6g %.6g])', filtering.HPF_Order, filtering.HPF_Cutoff_Frequency(1), filtering.HPF_Cutoff_Frequency(2)));
+        else
+            str = char(sprintf('BPF (Ord = %d | Fc = [%.6g %.6g]) + %s', filtering.HPF_Order, filtering.HPF_Cutoff_Frequency(1), filtering.HPF_Cutoff_Frequency(2), filtering.Name));
+        end
     else
-        str = char(sprintf('HPF (Ord = %d | Fc = %.6g) + %s', filtering.HPF_Order, filtering.HPF_Cutoff_Frequency, filtering.Name));
+        if strcmpi(filtering.Name, 'raw')
+            str = char(sprintf('HPF (Ord = %d | Fc = %.6g)', filtering.HPF_Order, filtering.HPF_Cutoff_Frequency));
+        else
+            str = char(sprintf('HPF (Ord = %d | Fc = %.6g) + %s', filtering.HPF_Order, filtering.HPF_Cutoff_Frequency, filtering.Name));
+        end
     end
 elseif filtering.Apply_Polynomial_Detrend
     if strcmpi(filtering.Name, 'raw')
