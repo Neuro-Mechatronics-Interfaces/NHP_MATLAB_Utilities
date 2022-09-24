@@ -41,7 +41,7 @@ elseif filtering.Apply_HPF && filtering.Apply_Polynomial_Detrend
         end
     end
 elseif filtering.Apply_HPF && filtering.Apply_Virtual_Reference
-    if numel(HPF_Cutoff_Frequency) == 2
+    if numel(filtering.HPF_Cutoff_Frequency) == 2
         if strcmpi(filtering.Name, 'raw')
             str = char(sprintf('BPF (Ord = %d | Fc = [%.6g %.6g]) + VRef', filtering.HPF_Order, filtering.HPF_Cutoff_Frequency(1), filtering.HPF_Cutoff_Frequency(2)));
         else
