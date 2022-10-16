@@ -107,9 +107,7 @@ if filtering.Apply_Stim_Blanking
      e_start = trigs + filtering.Stim_Blanking_Epoch(1);
      e_stop = stops + filtering.Stim_Blanking_Epoch(2);
      
-     % Do a pre-interpolation DC bias removal filtering
-     [b, a] = butter(filtering.Pre_Blanking_HPF_Order, filtering.Pre_Blanking_HPF_Cutoff_Frequency / (fs / 2), 'high');
-     x = filter(b, a, double(x));
+     % Linear interpolation between the two points
      for ii = 1:numel(e_start)
          k = e_stop(ii) - e_start(ii);
          x(e_start(ii):e_stop(ii), :) = interp1([0, k], x([e_start(ii); e_stop(ii)], :), 0:k, 'linear');
