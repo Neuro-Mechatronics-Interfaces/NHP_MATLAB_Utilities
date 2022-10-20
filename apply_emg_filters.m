@@ -75,42 +75,51 @@ filtering.Name = fixCase(filtering.Name);
 %   (For differential, top and bottom rows are not plotted)
 filtering.Add_To_Plots = true(64, 1);
 if filtering.Apply_Stim_Blanking
-     if nargin < 5
-         error('You set Apply_Stim_Blanking to true, but did not supply `trigs` and `stops` inputs, which are required in that case.');
-     end
-     % Check that our stim onset and offset samples make sense:
-     if numel(trigs) > numel(stops)
-         trigs(1) = [];
-         if numel(trigs) ~= numel(stops)
-             if numel(stops) == (numel(trigs)+1)
-                 stops(end) = [];
-             else
-                 error('Mismatch: %d trigs and %d stops.', numel(trigs), numel(stops));
-             end
-         end
-     else
-         stops(1) = [];
-         if numel(trigs) ~= numel(stops)
-             if numel(trigs) == (numel(stops)+1)
-                 trigs(end) = [];
-             else
-                 error('Mismatch: %d trigs and %d stops.', numel(trigs), numel(stops));
-             end
-         end
-     end
-     if stops(1) < trigs(1)
-         trigs(end) = [];
-         stops(1) = [];
-     end
+    if filtering.Use_Stops_In_Stim_Blanking
+        if nargin < 5
+            error('You set Apply_Stim_Blanking to true, but did not supply `trigs` and `stops` inputs, which are required in that case.');
+        end
+        % Check that our stim onset and offset samples make sense:
+        if numel(trigs) > numel(stops)
+            trigs(1) = [];
+            if numel(trigs) ~= numel(stops)
+                if numel(stops) == (numel(trigs)+1)
+                    stops(end) = [];
+                else
+                    error('Mismatch: %d trigs and %d stops.', numel(trigs), numel(stops));
+                end
+            end
+        else
+            stops(1) = [];
+            if numel(trigs) ~= numel(stops)
+                if numel(trigs) == (numel(stops)+1)
+                    trigs(end) = [];
+                else
+                    error('Mismatch: %d trigs and %d stops.', numel(trigs), numel(stops));
+                end
+            end
+        end
+        if stops(1) < trigs(1)
+            trigs(end) = [];
+            stops(1) = [];
+        end
+    end
      
      % Set of samples to interpolate linearly between
      e_start = trigs + filtering.Stim_Blanking_Epoch(1);
-     e_stop = stops + filtering.Stim_Blanking_Epoch(2);
+     if filtering.Use_Stops_In_Stim_Blanking
+        e_stop = stops + filtering.Stim_Blanking_Epoch(2);
+     else
+        e_stop = trigs + filtering.Stim_Blanking_Epoch(2);
+     end
      
      % Linear interpolation between the two points
+     nx = size(x,1);
      for ii = 1:numel(e_start)
-         k = e_stop(ii) - e_start(ii);
-         x(e_start(ii):e_stop(ii), :) = interp1([0, k], x([e_start(ii); e_stop(ii)], :), 0:k, 'linear');
+         istop = min(e_stop(ii),nx);
+         istart = max(e_start(ii),1);
+         k = istop - istart;
+         x(istart:istop, :) = interp1([0, k], x([istart; istop], :), 0:k, 'linear');
      end
 end
 
