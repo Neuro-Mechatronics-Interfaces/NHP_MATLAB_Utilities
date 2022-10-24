@@ -91,7 +91,23 @@ else
 end
 
 if filtering.Apply_Max_Rescale
-    str = ['(Rescaled) ', str]; 
+    if filtering.Apply_Stim_Blanking && filtering.Apply_Pre_Stimulus_Normalization
+        str = ['(Artifact Blanked + Pre-Stim Z-score) ', str];        
+    elseif filtering.Apply_Stim_Blanking
+        str = ['(Artifact Blanked + Max-Rescaled) ', str];        
+    elseif filtering.Apply_Pre_Stimulus_Normalization
+        str = ['(Pre-Stim Z-score) ', str];
+    else
+        str = ['(Max-Rescaled) ', str]; 
+    end
+else
+    if filtering.Apply_Stim_Blanking && filtering.Apply_Pre_Stimulus_Normalization
+        str = ['(Artifact Blanked + Pre-Stim Z-score) ', str]; 
+    elseif filtering.Apply_Stim_Blanking
+        str = ['(Artifact Blanked) ', str];
+    elseif filtering.Apply_Pre_Stimulus_Normalization
+        str = ['(Pre-Stim Z-score) ', str];
+    end
 end
 
 end
