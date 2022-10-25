@@ -1,10 +1,10 @@
-function [z, fs, filtering] = apply_emg_filters(x, filtering, fs, trigs, stops)
+function [z, fs, filtering, trigs, stops] = apply_emg_filters(x, filtering, fs, trigs, stops)
 %APPLY_EMG_FILTERS Apply filtering to EMG signal in data struct x.
 %
 % Syntax:
 %   [z, fs, filtering] = apply_emg_filters(x, filtering);
 %   [z, fs, filtering] = apply_emg_filters(x, filtering, fs);
-%   [z, fs, filtering] = apply_emg_filters(x, filtering, fs, trigs, stops);
+%   [z, fs, filtering, trigs, stops] = apply_emg_filters(x, filtering, fs, trigs, stops);
 %
 % Inputs:
 %   x - Data struct with field: `samples` and `sample_rate`, or data array. 
