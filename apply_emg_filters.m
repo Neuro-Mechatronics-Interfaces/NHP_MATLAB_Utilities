@@ -69,7 +69,7 @@ if nargin < 3
     n_trigs = max(floor(size(x, 1) ./ fs) - 1, 3); 
 end
 
-filtering.Name = fixCase(filtering.Name);
+filtering.Name = utils.fixCase(filtering.Name);
 
 % Get a mask indicating whether to plot a given channel.
 %   (For differential, top and bottom rows are not plotted)
