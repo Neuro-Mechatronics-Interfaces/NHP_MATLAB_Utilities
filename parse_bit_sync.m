@@ -89,8 +89,9 @@ if nargin > 2
 end
 
 if save_output
-    if (numel(offset) < 10) && (exist(fullfile(out_path, sprintf('%s_sync.mat', data.name)), 'file')~=0)
-        warning('Only %d triggers parsed from bit sync signal for %s! Skipped saving empty vector.', numel(offset), data.name);
+    out_f = fullfile(out_path, sprintf('%s_sync.mat', data.name));
+    if ((numel(offset) < 1) || (numel(onset) < 1)) && (exist(out_f, 'file')~=0)
+        warning('Missing triggers using <strong>BIT-%02d</strong> for %s!\n\t->\tSkipped saving, since a _sync file was already present:\n\t\t\t(%s)\n', sync_bit, data.name, out_f);
         return;
     else
         if exist(out_path, 'dir') == 0
@@ -100,7 +101,6 @@ if save_output
                 warning(me.message);
             end
         end
-        out_f = fullfile(out_path, sprintf('%s_sync.mat', data.name));
         save(out_f, 'onset', 'offset', 'sync_data', '-v7.3');
     end
 end

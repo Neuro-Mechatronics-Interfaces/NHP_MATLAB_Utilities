@@ -110,4 +110,12 @@ else
     end
 end
 
+if filtering.Subtract_Cross_Trial_Mean
+    if strcmpi(str(end), ')')
+        str = [str(1:(end-1)), ' | Variance)'];
+    else
+        str = [str, ' | Variance'];
+    end
+end
+
 end
