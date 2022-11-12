@@ -112,9 +112,9 @@ end
 
 if filtering.Subtract_Cross_Trial_Mean
     if strcmpi(str(end), ')')
-        str = [str(1:(end-1)), ' | Variance)'];
+        str = [str(1:(end-1)), ' | S.D.)'];
     else
-        str = [str, ' | Variance'];
+        str = [str, ' | S.D.'];
     end
 end
 
