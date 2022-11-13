@@ -105,21 +105,66 @@ if filtering.Apply_Stim_Blanking
         end
     end
      
-     % Set of samples to interpolate linearly between
-     e_start = trigs + filtering.Stim_Blanking_Epoch(1);
-     if filtering.Use_Stops_In_Stim_Blanking
-        e_stop = stops + filtering.Stim_Blanking_Epoch(2);
+     if filtering.Use_PCA_Stim_Blanking && (numel(trigs) >= 5)
+         % Reconstruct centered mean without first two PCs.
+         if filtering.Use_Stops_In_Stim_Blanking
+             if numel(stops) >= numel(trigs)
+                e_extend = round(median(trigs - stops(1:numel(trigs))));
+             else
+                e_extend = 0;
+             end
+         else
+             e_extend = 0;
+         end
+         vec = ((filtering.Stim_Blanking_Epoch(1)+1):(filtering.Stim_Blanking_Epoch(2) + e_extend))';
+         art_sample_indices = vec + reshape(trigs,1,numel(trigs));
+         % Use median subtraction and small filter to remove DC-bias:
+         x = x - median(x, 1);
+         [b,a] = butter(1,0.02,'high'); % ~40-Hz @ 4kHz fs (nyquist = 2kHz)
+         x = filter(b,a,x')';
+         for ii = 1:size(x,2)
+             tmp = x(:,ii);
+             art_data = tmp(art_sample_indices);
+             [coeff,score,~,~,explained,mu] = pca(art_data);
+             cs = cumsum(explained);
+             i_recon = min(find(cs > filtering.Stim_Artifact_Variance_Removed,1,'first')+1,size(score,2));
+             recon_data = score(:,i_recon:end)*coeff(:,i_recon:end)' + mu;
+%              recon_data = filter(b,a,recon_data);
+             if filtering.Verbose
+                fprintf(1,"Ch-%d: Reconstructed without first <strong>%d</strong> (%4.2f%% variance) principal components.\n",ii,i_recon-1,cs(i_recon-1));
+                fig = figure('Name', sprintf('Debugging: Channel-%02d', ii), 'Color', 'w'); 
+                L = tiledlayout(fig, 2, 1);
+                title(L, sprintf('Debugging: Channel-%02d (%4.2f%% variance | %d PCs removed)', ii, cs(i_recon-1), i_recon-1),  ...
+                    'Color', 'k', 'FontName', 'Tahoma');
+                ax = nexttile(L);
+                plot(ax,vec./4, art_data);
+                ylabel(ax, 'Original EMG (\muV)', 'FontName', 'Tahoma', 'Color', 'k');
+                ax = nexttile(L);
+                plot(ax, vec./4, recon_data);
+                ylabel(ax, 'Reconstructed EMG (\muV)', 'FontName', 'Tahoma', 'Color', 'k');
+                xlabel(ax, 'Time (ms | relative to stim onset)', 'FontName', 'Tahoma', 'Color', 'k');
+                subtitle(L, "(Close me to continue...)", 'FontName', 'Tahoma', 'Color', [0.65 0.65 0.65]);
+                waitfor(fig);
+             end
+             x(art_sample_indices(:), ii) = recon_data(:);
+         end
      else
-        e_stop = trigs + filtering.Stim_Blanking_Epoch(2);
-     end
-     
-     % Linear interpolation between the two points
-     nx = size(x,1);
-     for ii = 1:numel(e_start)
-         istop = min(e_stop(ii),nx);
-         istart = max(e_start(ii),1);
-         k = istop - istart;
-         x(istart:istop, :) = interp1([0, k], x([istart; istop], :), 0:k, 'linear');
+         % Otherwise, use linear interpolation between the two points
+         % -> Set (relative) samples for defining artifact blanking epoch. 
+         e_start = trigs + filtering.Stim_Blanking_Epoch(1);
+         if filtering.Use_Stops_In_Stim_Blanking
+            e_stop = stops + filtering.Stim_Blanking_Epoch(2);
+         else
+            e_stop = trigs + filtering.Stim_Blanking_Epoch(2);
+         end
+         % -> Interpolate on a trial-by-trial basis.
+         nx = size(x,1);
+         for ii = 1:numel(e_start)
+             istop = min(e_stop(ii),nx);
+             istart = max(e_start(ii),1);
+             k = istop - istart;
+             x(istart:istop, :) = interp1([0, k], x([istart; istop], :), 0:k, 'linear');
+         end
      end
 end
 

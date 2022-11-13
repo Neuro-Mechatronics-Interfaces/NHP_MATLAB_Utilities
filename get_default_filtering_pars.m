@@ -28,10 +28,13 @@ opts.TMSi.Array.Stim_Blanking_Epoch = [-8 44];              % Samples to blank a
 opts.TMSi.Array.Subtract_Cross_Trial_Mean = false;          % Subtract the average response so you are only looking at response variance?
 opts.TMSi.Array.Apply_Virtual_Reference = true;             % Apply virtual common average subtraction?
 opts.TMSi.Array.Apply_Pre_Stimulus_Normalization = true;    % Normalize post-stimulus amplitudes by pre-stimulus mean and variance?
+opts.TMSi.Array.Stim_Artifact_Variance_Removed = 50.0;      % Percent of total variance removed using reconstruction from non-artifact principal components (if Use_PCA_Stim_Blanking is true, and Apply_Stim_Blanking is also true). 
 opts.TMSi.Array.HPF_Order = 2;                              % Butterworth filter order for High-pass filter
 opts.TMSi.Array.HPF_Cutoff_Frequency = [25 400];            % Cutoff frequency for High-pass filter
 opts.TMSi.Array.Polynomial_Detrend_Order = 3;               % If this is NaN, auto-compute polynomial detrend order from number of triggers. Otherwise, use a specified polynomial fit to detrend data.
 opts.TMSi.Array.Use_Stops_In_Stim_Blanking = false;         % Use "stops" vector from sync signal in determining length of stim artifact?
+opts.TMSi.Array.Use_PCA_Stim_Blanking = true;               % Use PCA in the stim artifact rejection, subtracting projection from the first principal component from the response data.
+opts.TMSi.Array.Verbose = false;                            % Set true to provide extra debugging in Command Window
 
 opts.TMSi.Bipolar = struct;
 opts.TMSi.Bipolar.Name = "Rectified";                       % Can be: "Raw" | "Rectified" | "Vref"
@@ -44,10 +47,13 @@ opts.TMSi.Bipolar.Stim_Blanking_Epoch = [-8 44];            % Samples to blank a
 opts.TMSi.Bipolar.Subtract_Cross_Trial_Mean = false;        % Subtract the average response so you are only looking at response variance?
 opts.TMSi.Bipolar.Apply_Virtual_Reference = false;          % Apply virtual common average subtraction?
 opts.TMSi.Bipolar.Apply_Pre_Stimulus_Normalization = true;  % Normalize post-stimulus amplitudes by pre-stimulus mean and variance?
+opts.TMSi.Bipolar.Stim_Artifact_Variance_Removed = 50.0;    % Percent of total variance removed using reconstruction from non-artifact principal components (if Use_PCA_Stim_Blanking is true, and Apply_Stim_Blanking is also true).
 opts.TMSi.Bipolar.HPF_Order = 2;                            % Butterworth filter order for High-pass filter
 opts.TMSi.Bipolar.HPF_Cutoff_Frequency = [25 400];          % Cutoff frequency for High-pass filter
 opts.TMSi.Bipolar.Polynomial_Detrend_Order = 7;             % If this is NaN, auto-compute polynomial detrend order from number of triggers. Otherwise, use a specified polynomial fit to detrend data.
 opts.TMSi.Bipolar.Use_Stops_In_Stim_Blanking = false;       % Use "stops" vector from sync signal in determining length of stim artifact?
+opts.TMSi.Bipolar.Use_PCA_Stim_Blanking = true;             % Use PCA in the stim artifact rejection, subtracting projection from the first principal component from the response data.
+opts.TMSi.Bipolar.Verbose = false;                          % Set true to provide extra debugging in Command Window
 
 opts.TMSi.RMS = struct;
 opts.TMSi.RMS.Name = "Rectified";                       % Can be: "Raw" | "Rectified" | "Vref"
@@ -60,11 +66,13 @@ opts.TMSi.RMS.Stim_Blanking_Epoch = [-8 44];            % Samples to blank aroun
 opts.TMSi.RMS.Subtract_Cross_Trial_Mean = false;        % Subtract the average response so you are only looking at response variance?
 opts.TMSi.RMS.Apply_Virtual_Reference = true;           % Apply virtual common average subtraction?
 opts.TMSi.RMS.Apply_Pre_Stimulus_Normalization = false; % Normalize post-stimulus amplitudes by pre-stimulus mean and variance?
+opts.TMSi.RMS.Stim_Artifact_Variance_Removed = 50.0;    % Percent of total variance removed using reconstruction from non-artifact principal components (if Use_PCA_Stim_Blanking is true, and Apply_Stim_Blanking is also true).
 opts.TMSi.RMS.HPF_Order = 2;                            % Butterworth filter order for High-pass filter
 opts.TMSi.RMS.HPF_Cutoff_Frequency = [25 400];          % Cutoff frequency for High-pass filter
 opts.TMSi.RMS.Polynomial_Detrend_Order = 7;             % If this is NaN, auto-compute polynomial detrend order from number of triggers. Otherwise, use a specified polynomial fit to detrend data.
 opts.TMSi.RMS.Use_Stops_In_Stim_Blanking = false;       % Use "stops" vector from sync signal in determining length of stim artifact?
-
+opts.TMSi.RMS.Use_PCA_Stim_Blanking = true;             % Use PCA in the stim artifact rejection, subtracting projection from the first principal component from the response data.
+opts.TMSi.RMS.Verbose = false;                          % Set true to provide extra debugging in Command Window
 
 if nargin < 3
     filter_type = "Rectified"; 

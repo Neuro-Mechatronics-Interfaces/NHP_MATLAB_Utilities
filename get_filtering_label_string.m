@@ -90,11 +90,16 @@ else
     str = char(filtering.Name);
 end
 
+if filtering.Use_PCA_Stim_Blanking
+    art_str = sprintf('PCA-Art-Blank=%3.1f%%', filtering.Stim_Artifact_Variance_Removed);
+else
+    art_str = sprintf('Art. Lin. Interp [%d %d]', filtering.Stim_Blanking_Epoch);
+end
 if filtering.Apply_Max_Rescale
     if filtering.Apply_Stim_Blanking && filtering.Apply_Pre_Stimulus_Normalization
-        str = ['(Artifact Blanked + Pre-Stim Z-score) ', str];        
+        str = [sprintf('(%s + Pre-Stim Z-score) ', art_str), str];        
     elseif filtering.Apply_Stim_Blanking
-        str = ['(Artifact Blanked + Max-Rescaled) ', str];        
+        str = [sprintf('(%s + Max-Rescaled) ', art_str), str];        
     elseif filtering.Apply_Pre_Stimulus_Normalization
         str = ['(Pre-Stim Z-score) ', str];
     else
@@ -102,9 +107,9 @@ if filtering.Apply_Max_Rescale
     end
 else
     if filtering.Apply_Stim_Blanking && filtering.Apply_Pre_Stimulus_Normalization
-        str = ['(Artifact Blanked + Pre-Stim Z-score) ', str]; 
+        str = [sprintf('(%s + Pre-Stim Z-score) ', art_str), str]; 
     elseif filtering.Apply_Stim_Blanking
-        str = ['(Artifact Blanked) ', str];
+        str = [sprintf('(%s) ', art_str), str];
     elseif filtering.Apply_Pre_Stimulus_Normalization
         str = ['(Pre-Stim Z-score) ', str];
     end
