@@ -118,6 +118,7 @@ if filtering.Apply_Stim_Blanking
          end
          vec = ((filtering.Stim_Blanking_Epoch(1)+1):(filtering.Stim_Blanking_Epoch(2) + e_extend))';
          art_sample_indices = vec + reshape(trigs,1,numel(trigs));
+         art_sample_indices(any((art_sample_indices < 0) | (art_sample_indices > size(x,1)),2),:) = [];
          % Use median subtraction and small filter to remove DC-bias:
          x = x - median(x, 1);
          [b,a] = butter(1,0.02,'high'); % ~40-Hz @ 4kHz fs (nyquist = 2kHz)
