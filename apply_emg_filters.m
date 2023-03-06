@@ -214,7 +214,9 @@ end
 if filtering.Apply_Virtual_Reference
     % Only use common-average subtraction for array type
     if filtering.Type == "Array"
-        data_in = data_in - mean(data_in, 1); 
+        for ii = 1:numel(filtering.Subgroups_CAR)
+            data_in(filtering.Subgroups_CAR{ii}, :) = data_in(filtering.Subgroups_CAR{ii}, :) - mean(data_in(filtering.Subgroups_CAR{ii}, :), 1);
+        end
     end
 end
 
