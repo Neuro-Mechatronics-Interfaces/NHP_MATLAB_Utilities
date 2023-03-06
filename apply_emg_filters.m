@@ -34,7 +34,7 @@ function [z, fs, filtering, trigs, stops] = apply_emg_filters(x, filtering, fs, 
 
 if isstruct(x) || isa(x, 'TMSiSAGA.Data')
     fs = x.sample_rate;
-    if ismember(filtering.Type, ["Array", "RMS"])
+    if ismember(filtering.Type, ["Array", "RMS", "Textiles"])
         b = horzcat(x.channels{:});
         x = x.samples(contains({b.alternative_name}, 'UNI'), :)';
         %x = x.samples(1:64, :)';
@@ -46,7 +46,7 @@ else
     if nargin < 3
         fs = 4000;
     end
-    if filtering.Type == "Array"
+    if (filtering.Type == "Array") || (filtering.Type == "RMS") || (filtering.Type == "Textiles")
         if size(x, 2)~=64
             x = x';
         end
@@ -120,9 +120,13 @@ if filtering.Apply_Stim_Blanking
          art_sample_indices = vec + reshape(trigs,1,numel(trigs));
          art_sample_indices(any((art_sample_indices < 0) | (art_sample_indices > size(x,1)),2),:) = [];
          % Use median subtraction and small filter to remove DC-bias:
-         x = x - median(x, 1);
+         for ii = 1:numel(filtering.Subgroups_CAR)
+            x(:, filtering.Subgroups_CAR{ii}) = x(:, filtering.Subgroups_CAR{ii}) ...
+                - median(x(:, filtering.Subgroups_CAR{ii}), 1);
+         end
+         
          [b,a] = butter(1,0.02,'high'); % ~40-Hz @ 4kHz fs (nyquist = 2kHz)
-         x = filter(b,a,x')';
+         x = filter(b,a,x);
          for ii = 1:size(x,2)
              tmp = x(:,ii);
              art_data = tmp(art_sample_indices);
@@ -130,25 +134,26 @@ if filtering.Apply_Stim_Blanking
              cs = cumsum(explained);
              i_recon = min(find(cs > filtering.Stim_Artifact_Variance_Removed,1,'first')+1,size(score,2));
              recon_data = score(:,i_recon:end)*coeff(:,i_recon:end)' + mu;
-%              recon_data = filter(b,a,recon_data);
+             %              recon_data = filter(b,a,recon_data);
              if filtering.Verbose
-                fprintf(1,"Ch-%d: Reconstructed without first <strong>%d</strong> (%4.2f%% variance) principal components.\n",ii,i_recon-1,cs(i_recon-1));
-                fig = figure('Name', sprintf('Debugging: Channel-%02d', ii), 'Color', 'w'); 
-                L = tiledlayout(fig, 2, 1);
-                title(L, sprintf('Debugging: Channel-%02d (%4.2f%% variance | %d PCs removed)', ii, cs(i_recon-1), i_recon-1),  ...
-                    'Color', 'k', 'FontName', 'Tahoma');
-                ax = nexttile(L);
-                plot(ax,vec./4, art_data);
-                ylabel(ax, 'Original EMG (\muV)', 'FontName', 'Tahoma', 'Color', 'k');
-                ax = nexttile(L);
-                plot(ax, vec./4, recon_data);
-                ylabel(ax, 'Reconstructed EMG (\muV)', 'FontName', 'Tahoma', 'Color', 'k');
-                xlabel(ax, 'Time (ms | relative to stim onset)', 'FontName', 'Tahoma', 'Color', 'k');
-                subtitle(L, "(Close me to continue...)", 'FontName', 'Tahoma', 'Color', [0.65 0.65 0.65]);
-                waitfor(fig);
+                 fprintf(1,"Ch-%d: Reconstructed without first <strong>%d</strong> (%4.2f%% variance) principal components.\n",ii,i_recon-1,cs(i_recon-1));
+                 fig = figure('Name', sprintf('Debugging: Channel-%02d', ii), 'Color', 'w');
+                 L = tiledlayout(fig, 2, 1);
+                 title(L, sprintf('Debugging: Channel-%02d (%4.2f%% variance | %d PCs removed)', ii, cs(i_recon-1), i_recon-1),  ...
+                     'Color', 'k', 'FontName', 'Tahoma');
+                 ax = nexttile(L);
+                 plot(ax,vec./4, art_data);
+                 ylabel(ax, 'Original EMG (\muV)', 'FontName', 'Tahoma', 'Color', 'k');
+                 ax = nexttile(L);
+                 plot(ax, vec./4, recon_data);
+                 ylabel(ax, 'Reconstructed EMG (\muV)', 'FontName', 'Tahoma', 'Color', 'k');
+                 xlabel(ax, 'Time (ms | relative to stim onset)', 'FontName', 'Tahoma', 'Color', 'k');
+                 subtitle(L, "(Close me to continue...)", 'FontName', 'Tahoma', 'Color', [0.65 0.65 0.65]);
+                 waitfor(fig);
              end
              x(art_sample_indices(:), ii) = recon_data(:);
          end
+
      else
          % Otherwise, use linear interpolation between the two points
          % -> Set (relative) samples for defining artifact blanking epoch. 
