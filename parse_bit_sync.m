@@ -54,8 +54,12 @@ elseif isa(data, 'TMSiSAGA.Data') % Note that output of TMSiSAGA.Poly5.read is o
     channels = horzcat(data.channels{:});
     itrig_channel = contains({channels.alternative_name}, trig_channel);
     trig_channel_data = data.samples(itrig_channel, :);
-elseif isnumeric(data) && (size(data,2)==1)
-    trig_channel_data = data';
+elseif isnumeric(data)
+    if (size(data,2)==1)
+        trig_channel_data = data';
+    else
+        trig_channel_data = data;
+    end
 else
     error('Data passed should be a struct containing fields "samples", "channels" and "sample_rate"');
 end
