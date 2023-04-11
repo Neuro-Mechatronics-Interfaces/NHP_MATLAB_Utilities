@@ -52,14 +52,14 @@ xg = compute_grid(xv, dx, xe);
 yg = compute_grid(yv, dy, ye);
 
 xi = discretize(xv, xg);
-yi = dixcretize(yv, yg);
+yi = discretize(yv, yg);
 
-grid_index = sub2ind([numel(xg)-1, numel(yg)-1], yi, xi);
+grid_index = sub2ind([numel(yg)-1, numel(xg)-1], yi, xi);
 
     function g = compute_grid(v, d, e)
         %COMPUTE_GRID  Sub-function to apply to xg and yg calculation
         if isnan(d)
-            d = 0.5 * min(abs(diff(unique(x))));
+            d = 0.5 * min(abs(diff(unique(v))));
         end
         if isnan(e(1))
             e(1) = min(v) - d;
