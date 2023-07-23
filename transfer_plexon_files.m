@@ -5,27 +5,35 @@ function transfer_plexon_files(options)
 %   utils.transfer_plexon_files('Name',value,...);
 %
 % Options:
-%   LocalFolder - 'logs' folder in current folder is the default.
-%   EventExtension - '.uevt'
+%     options.LocalEventFolder {mustBeTextScalar, mustBeFolder} = fullfile(pwd, 'logs')
+%     options.LocalPlexonFolder {mustBeTextScalar, mustBeFolder} = "D:/PlexonData"
+%     options.LocalTMSiFolder {mustBeTextScalar, mustBeFolder} = "D:/TMSi/MATLAB"
+%     options.EventExtension {mustBeTextScalar} = '.uevt'
+%     options.RemoteFolderRoot {mustBeTextScalar,mustBeFolder} = "R:/NMLShare/raw_data/primate";
+%
+% See also: Contents, TASK_CreateUDPClient (Plexon_Tools/Online)
 arguments
     options.LocalEventFolder {mustBeTextScalar, mustBeFolder} = fullfile(pwd, 'logs')
-    options.LocalPlexonFolder {mustBeTextScalar, mustBeFolder} = "D:/PlexonData";
+    options.LocalPlexonFolder {mustBeTextScalar, mustBeFolder} = "D:/PlexonData"
+    options.LocalTMSiFolder {mustBeTextScalar, mustBeFolder} = "D:/TMSi/MATLAB/raw_data"
     options.EventExtension {mustBeTextScalar} = '.uevt'
+    options.RemoteFolderRoot {mustBeTextScalar,mustBeFolder} = "R:/NMLShare/raw_data/primate";
 end
 
+fclose("all");
 F = dir(fullfile(options.LocalEventFolder, strcat("*", options.EventExtension)));
 for iF = 1:numel(F)
     % 1. Get the file metadata from the filename
     [~,finfo,~] = fileparts(F(iF).name);
-    finfo = strsplit(finfo, '_');
-    subj = lower(char(finfo{1}));
+    f_parts = strsplit(finfo, '_');
+    subj = lower(char(f_parts{1}));
     subj(1) = upper(subj(1)); % Fix capitalization
-    yyyy = finfo{2};
-    mm = finfo{3};
-    dd = finfo{4};
-    ornt = finfo{5};
+    yyyy = f_parts{2};
+    mm = f_parts{3};
+    dd = f_parts{4};
+    ornt = f_parts{5};
     tank = sprintf('%s_%s_%s_%s', subj, yyyy, mm, dd);
-    outfolder_root = fullfile("R:\NMLShare\raw_data\primate", subj, tank);
+    outfolder_root = fullfile(options.RemoteFolderRoot, subj, tank);
     if exist(outfolder_root, 'dir')==0
         mkdir(outfolder_root);
     end
@@ -55,6 +63,16 @@ for iF = 1:numel(F)
     copyfile(fullfile(F(iF).folder, F(iF).name), fullfile(outfolder_events, sprintf('%s_%s_%s_%s_%s.uevt', subj, yyyy, mm, dd, ornt)));
     delete(fullfile(F(iF).folder, F(iF).name));
     fprintf(1,'complete.\n');
+    % 4. Copy the SAGA data files over to remote (.mat)
+    S = dir(fullfile(options.LocalTMSiFolder, subj, sprintf('%s_%s_%s_%s_%s_*.mat',subj,yyyy,mm,dd,ornt)));
+    if numel(S) > 0
+        for iS = 1:numel(S)
+            fprintf(1,'Moving TMSI FILE: <strong>%s</strong>...', S(iS).name);
+            copyfile(fullfile(S(iS).folder,S(iS).name), fullfile(outfolder_root, S(iS).name));
+            delete(fullfile(S(iS).folder,S(iS).name));
+            fprintf(1,'complete.\n');
+        end
+    end
 end
 
 end
