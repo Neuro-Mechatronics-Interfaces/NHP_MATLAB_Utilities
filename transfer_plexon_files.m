@@ -16,6 +16,7 @@ arguments
     options.LocalEventFolder {mustBeTextScalar, mustBeFolder} = fullfile(pwd, 'logs')
     options.LocalPlexonFolder {mustBeTextScalar, mustBeFolder} = "D:/PlexonData"
     options.LocalTMSiFolder {mustBeTextScalar, mustBeFolder} = "D:/TMSi/MATLAB/raw_data"
+    options.LocalTRecFolder {mustBeTextScalar, mustBeFolder} = "D:/TREC/Logs/Position"
     options.EventExtension {mustBeTextScalar} = '.uevt'
     options.RemoteFolderRoot {mustBeTextScalar,mustBeFolder} = "R:/NMLShare/raw_data/primate";
 end
@@ -49,7 +50,7 @@ for iF = 1:numel(F)
         end
         for iP = 1:numel(P)
             fprintf(1,'Moving PLEX FILE: <strong>%s</strong>...', P(iP).name);
-            copyfile(fullfile(P(iP).folder, P(iP).name), fullfile(outfolder_plex, P(iP).name));
+            copyfile(fullfile(P(iP).folder, P(iP).name), fullfile(outfolder_plex, strrep(P(iP).name, upper(subj), subj)));
             delete(fullfile(P(iP).folder, P(iP).name));
             fprintf(1,'complete.\n');
         end
@@ -70,6 +71,20 @@ for iF = 1:numel(F)
             fprintf(1,'Moving TMSI FILE: <strong>%s</strong>...', S(iS).name);
             copyfile(fullfile(S(iS).folder,S(iS).name), fullfile(outfolder_root, S(iS).name));
             delete(fullfile(S(iS).folder,S(iS).name));
+            fprintf(1,'complete.\n');
+        end
+    end
+    % 5. Copy the TREC files over to remote (.csv)
+    T = dir(fullfile(options.LocalTRecFolder, '*Position.csv'));
+    if numel(T) > 0
+        outfolder_trec = fullfile(outfolder_root, sprintf('%s_TREC', tank));
+        if exist(outfolder_trec, 'dir')==0
+            mkdir(outfolder_trec);
+        end
+        for iT = 1:numel(T)
+            fprintf(1,'Moving TREC FILE: <strong>%s</strong>...', T(iT).name);
+            copyfile(fullfile(T(iT).folder,T(iT).name), fullfile(outfolder_trec, T(iT).name));
+            delete(fullfile(T(iT).folder,T(iT).name));
             fprintf(1,'complete.\n');
         end
     end
