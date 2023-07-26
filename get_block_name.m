@@ -30,6 +30,7 @@ else
         pars.alignment_parent_folder, pars.alignment_folder] = ...
          utils.parameters('raw_matfiles_folder', 'meta_file_expr', ...
             'events_file_expr', 'alignment_parent_folder', 'alignment_folder');
+    pars.tag = '';
     pars = utils.parse_parameters(pars, varargin{:});
 end
 if (numel(BLOCK) > 1) || (numel(ARRAY) > 1)
@@ -58,8 +59,11 @@ end
 [YYYY, MM, DD] = utils.parse_date_args(YYYY, MM, DD);
 
 tank = string(sprintf('%s_%04d_%02d_%02d', SUBJ, YYYY, MM, DD));
-block = string(sprintf('%s_%s_%d', tank, ARRAY, BLOCK));
-
+if strlength(pars.tag) > 0
+    block = string(sprintf('%s_%s_%s_%d', tank, pars.tag, ARRAY, BLOCK));
+else
+    block = string(sprintf('%s_%s_%d', tank, ARRAY, BLOCK));
+end
 f = struct;
 f.Date = string(sprintf('%04d_%02d_%02d', YYYY, MM, DD));
 f.DateValue = datetime(YYYY, MM, DD);
