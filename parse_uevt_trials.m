@@ -40,7 +40,7 @@ for ii = 1:n
         end
     end
     if ~isempty(i_target)
-        Target(ii) = enum.Target(T.Data(i_target));
+        Target(ii) = enum.TaskTarget(T.Data(i_target));
     else
         if ii > 1
             Target(ii) = Target(ii-1);
