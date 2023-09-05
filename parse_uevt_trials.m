@@ -16,21 +16,23 @@ if isempty(i_last)
     error("No logs with keyword: %s -- check keyword or uevt file.", options.Keyword);
 end
 
-n = T.Data(i_last)+1;
-
+Time = T.Time(T.Event == options.Keyword);
+n = numel(Time);
 Plexon_Block = (1:n)';
 SAGA_Block = nan(n,1); 
 Target = enum.TaskTarget(-1.*ones(n,1));
 Direction = enum.TaskDirection(-1.*ones(n,1));
 Outcome = enum.TaskOutcome(-1.*ones(n,1));
 Orientation = enum.TaskOrientation(-1.*ones(n,1));
-Time = T.Time(T.Event == "STOP");
+i_first = find(T.Data(T.Event == "Ourcome"),1,'first');
+if ~isempty(i_first)
+    Outcome(1) = enum.TaskOutcome(i_first);
+end
 
 for ii = 1:n
     i_next = find(T.Event == options.Keyword, 1, 'first');
     i_orientation = find(T.Event(1:(i_next-1)) == "Orientation", 1, 'first');
     i_target = find(T.Event(1:(i_next-1)) == "Target", 1, 'first');
-    i_outcome = find(T.Event(1:(i_next-1)) == "Outcome", 1, 'first');
     i_direction = find(T.Event(1:(i_next-1)) == "Direction", 1, 'first');
     if ~isempty(i_orientation)
         Orientation(ii) = enum.TaskOrientation(T.Data(i_orientation));
@@ -53,11 +55,11 @@ for ii = 1:n
             Direction(ii) = Direction(ii-1);
         end
     end
-    if ~isempty(i_outcome)
-        Outcome(ii) = enum.TaskOutcome(T.Data(i_outcome));
-    else
-        if ii > 1
-            Outcome(ii) = Outcome(ii-1);
+    if ii > 1
+        if Direction(ii)~=Direction(ii-1)
+            Outcome(ii) = enum.TaskOutcome.SUCCESSFUL;
+        else
+            Outcome(ii) = enum.TaskOutcome.UNSUCCESSFUL;
         end
     end
     SAGA_Block(ii) = sum(Orientation == Orientation(ii))-1;
