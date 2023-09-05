@@ -20,10 +20,10 @@ n = T.Data(i_last)+1;
 
 Plexon_Block = (1:n)';
 SAGA_Block = nan(n,1); 
-Target = task_enum.Target(-1.*ones(n,1));
-Direction = task_enum.Direction(-1.*ones(n,1));
-Outcome = task_enum.Outcome(-1.*ones(n,1));
-Orientation = task_enum.Orientation(-1.*ones(n,1));
+Target = enum.TaskTarget(-1.*ones(n,1));
+Direction = enum.TaskDirection(-1.*ones(n,1));
+Outcome = enum.TaskOutcome(-1.*ones(n,1));
+Orientation = enum.TaskOrientation(-1.*ones(n,1));
 Time = T.Time(T.Event == "STOP");
 
 for ii = 1:n
@@ -33,28 +33,28 @@ for ii = 1:n
     i_outcome = find(T.Event(1:(i_next-1)) == "Outcome", 1, 'first');
     i_direction = find(T.Event(1:(i_next-1)) == "Direction", 1, 'first');
     if ~isempty(i_orientation)
-        Orientation(ii) = task_enum.Orientation(T.Data(i_orientation));
+        Orientation(ii) = enum.TaskOrientation(T.Data(i_orientation));
     else
         if ii > 1
             Orientation(ii) = Orientation(ii-1);
         end
     end
     if ~isempty(i_target)
-        Target(ii) = task_enum.Target(T.Data(i_target));
+        Target(ii) = enum.Target(T.Data(i_target));
     else
         if ii > 1
             Target(ii) = Target(ii-1);
         end
     end
     if ~isempty(i_direction)
-        Direction(ii) = task_enum.Direction(T.Data(i_direction));
+        Direction(ii) = enum.TaskDirection(T.Data(i_direction));
     else
         if ii > 1
             Direction(ii) = Direction(ii-1);
         end
     end
     if ~isempty(i_outcome)
-        Outcome(ii) = task_enum.Outcome(T.Data(i_outcome));
+        Outcome(ii) = enum.TaskOutcome(T.Data(i_outcome));
     else
         if ii > 1
             Outcome(ii) = Outcome(ii-1);
