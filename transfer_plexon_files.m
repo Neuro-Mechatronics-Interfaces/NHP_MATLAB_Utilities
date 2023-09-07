@@ -74,20 +74,20 @@ for iF = 1:numel(F)
             fprintf(1,'complete.\n');
         end
     end
-    % 5. Copy the TREC files over to remote (.csv)
-    T = dir(fullfile(options.LocalTRecFolder, '*Position.csv'));
-    if numel(T) > 0
-        outfolder_trec = fullfile(outfolder_root, sprintf('%s_TREC', tank));
-        if exist(outfolder_trec, 'dir')==0
-            mkdir(outfolder_trec);
-        end
-        for iT = 1:numel(T)
-            fprintf(1,'Moving TREC FILE: <strong>%s</strong>...', T(iT).name);
-            copyfile(fullfile(T(iT).folder,T(iT).name), fullfile(outfolder_trec, T(iT).name));
-            delete(fullfile(T(iT).folder,T(iT).name));
-            fprintf(1,'complete.\n');
-        end
-    end
+%     % 5. Copy the TREC files over to remote (.csv)
+%     T = dir(fullfile(options.LocalTRecFolder, '*Position.csv'));
+%     if numel(T) > 0
+%         outfolder_trec = fullfile(outfolder_root, sprintf('%s_TREC', tank));
+%         if exist(outfolder_trec, 'dir')==0
+%             mkdir(outfolder_trec);
+%         end
+%         for iT = 1:numel(T)
+%             fprintf(1,'Moving TREC FILE: <strong>%s</strong>...', T(iT).name);
+%             copyfile(fullfile(T(iT).folder,T(iT).name), fullfile(outfolder_trec, T(iT).name));
+%             delete(fullfile(T(iT).folder,T(iT).name));
+%             fprintf(1,'complete.\n');
+%         end
+%     end
 end
 
 end
