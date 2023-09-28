@@ -38,6 +38,7 @@ This will add the folder with the correct package name. **Adding +utils to the e
 ### Handling NML Data Structures ###  
  + [apply_debounce](apply_debounce.m) - Debounce vector of sample times so that each is separated by *at least* `min_sample_interval` samples.  
  + [export_emg_for_muedit](export_emg_for_muedit.m) - export_emg_for_muedit(data, fsamp, nChan, ngrid, gridname, muscle) Exports matfile for MUedit app.  
+ + [generate_output_container_folder](generate_output_container_folder.m) -  Generate output folder (windows-like) path-string.  
  + [get_block_name](get_block_name.m) - Return the string info corresponding to a given block.  
  + [get_subj_query](get_subj_query.m) - Return the subject-info args for most "load" and "plot" queries, given the subject query struct.  
  + [print_timing_info](print_timing_info.m) - Prints total time for a given function to run.  
@@ -51,4 +52,6 @@ This will add the folder with the correct package name. **Adding +utils to the e
  + [fixCase](fixCase.m) - Fixes the input string so first character in string is capitalized and rest are lower-case.  
  + [get_tmsi_stim_data](get_tmsi_stim_data.m) - Return stim data specifically for TMSi blocks.  
  + [print_model_info](print_model_info.m) - Prints sfit object model coefficients in Command Window, or to a text file ID (if specified).  
- + [pattern_name_to_metadata](pattern_name_to_metadata.m) - Helper function to convert pattern files to metadata struct.  
+ + [pattern_name_to_metadata](pattern_name_to_metadata.m) - Helper function to convert pattern files to metadata struct.
+ + [save_figure](save_figure.m) - Exports figure in desired file formats, creating output folder if needed.
+

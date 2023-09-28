@@ -28,6 +28,7 @@
 % Handling NML Data Structures
 %   apply_debounce                     - Debounce vector of sample times so that each is separated by *at least* `min_sample_interval` samples.
 %   export_emg_for_muedit              - export_emg_for_muedit(data, fsamp, nChan, ngrid, gridname, muscle) Exports matfile for MUedit app. 
+%   generate_output_container_folder   - Generate output folder (windows-like) path-string.
 %   get_block_name                     - Return the string info corresponding to a given block
 %   get_subj_query                     - Return the subject-info args for most "load" and "plot" queries, given the subject query struct.
 %   print_timing_info                  - Prints total time for a given function to run.
@@ -42,3 +43,4 @@
 %   get_tmsi_stim_data                 - Return stim data specifically for TMSi blocks
 %   print_model_info                   - Prints sfit object model coefficients in Command Window, or to a text file ID (if specified).
 %   pattern_name_to_metadata           - Helper function to convert pattern files to metadata struct
+%   save_figure                        - Exports figure in desired file formats, creating output folder if needed.
