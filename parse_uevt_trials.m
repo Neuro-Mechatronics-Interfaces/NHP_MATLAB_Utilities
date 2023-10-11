@@ -17,19 +17,21 @@ if isempty(i_last)
 end
 
 Time = T.Time(T.Event == options.Keyword);
-n = numel(Time);
-Plexon_Block = (0:(n-1))';
+n = numel(Time)+1;
+Time(end+1) = Time(end) + seconds(2);
+Plexon_Block = (1:n)';
 SAGA_Block = nan(n,1); 
 Target = enum.TaskTarget(-1.*ones(n,1));
 Direction = enum.TaskDirection(-1.*ones(n,1));
 Outcome = enum.TaskOutcome(-1.*ones(n,1));
 Orientation = enum.TaskOrientation(-1.*ones(n,1));
 
-i_orientation = find(T.Event == "Orientation", 1, 'first');
-i_target = find(T.Event == "Target", 1, 'first');
-i_direction = find(T.Event == "Direction", 1, 'first');
-i_outcome = find(T.Event =="Outcome", 1, 'first');
 i_next = find(T.Event == options.Keyword, 1, 'first');
+i_orientation = find(T.Event(1:i_next) == "Orientation", 1, 'last');
+i_target = find(T.Event(1:i_next) == "Target", 1, 'last');
+i_direction = find(T.Event(1:i_next) == "Direction", 1, 'last');
+i_outcome = find(T.Event(1:i_next) =="Outcome", 1, 'last');
+
 
 if ~isempty(i_orientation)
     Orientation(1) = enum.TaskOrientation(T.Data(i_orientation));
@@ -43,13 +45,17 @@ end
 if ~isempty(i_outcome)
     Outcome(1) = enum.TaskOutcome(T.Data(i_outcome));
 end
-T(1:i_next,:) = [];
+% T(1:i_next,:) = [];
 
 for ii = 1:(n-1)
     i_next = find(T.Event == options.Keyword, 1, 'first');
-    i_orientation = find(T.Event(1:(i_next-1)) == "Orientation", 1, 'first');
-    i_target = find(T.Event(1:(i_next-1)) == "Target", 1, 'first');
-    i_direction = find(T.Event(1:(i_next-1)) == "Direction", 1, 'first');
+    if isempty(i_next)
+        i_next = size(T,1);
+    end
+    i_orientation = find(T.Event(1:i_next) == "Orientation", 1, 'last');
+    i_target = find(T.Event(1:i_next) == "Target", 1, 'last');
+    i_direction = find(T.Event(1:i_next) == "Direction", 1, 'last');
+    i_outcome = find(T.Event(1:i_next) =="Outcome", 1, 'last');
     if ~isempty(i_orientation)
         Orientation(ii+1) = enum.TaskOrientation(T.Data(i_orientation));
     else
@@ -65,12 +71,17 @@ for ii = 1:(n-1)
     else
         Direction(ii+1) = Direction(ii);
     end
-
-    if Direction(ii+1)~=Direction(ii)
-        Outcome(ii) = enum.TaskOutcome.SUCCESSFUL;
+    
+    if ~isempty(i_outcome)
+        Outcome(ii+1) = enum.TaskOutcome(T.Data(i_outcome));
     else
-        Outcome(ii) = enum.TaskOutcome.UNSUCCESSFUL;
+        Outcome(ii+1) = Outcome(ii);
     end
+%     if Direction(ii+1)~=Direction(ii)
+%         Outcome(ii) = enum.TaskOutcome.SUCCESSFUL;
+%     else
+%         Outcome(ii) = enum.TaskOutcome.UNSUCCESSFUL;
+%     end
 
     SAGA_Block(ii) = sum(Orientation == Orientation(ii))-1;
     T(1:i_next,:) = [];
