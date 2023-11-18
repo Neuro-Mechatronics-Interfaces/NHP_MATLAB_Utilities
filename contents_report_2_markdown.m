@@ -29,7 +29,7 @@ function txt = contents_report_2_markdown(contents_file, options)
 %#ok<*AGROW>
 
 arguments
-    contents_file {mustBeTextScalar, mustBeFile}
+    contents_file {mustBeTextScalar, mustBeFile} = 'Contents.m';
     options.Verbose (1,1) logical = true;
 end
 
