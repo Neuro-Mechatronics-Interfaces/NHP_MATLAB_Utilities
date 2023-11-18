@@ -57,7 +57,7 @@ for ii = 2:N
         if ~endsWith(tmp{2}, '.')
             tmp{2} = [tmp{2}, '.'];
         end
-        txt = [txt, sprintf(' + [%s](%s.m) - %s  ', tmp{1}, tmp{1}, tmp{2}), newline];
+        txt = [txt, sprintf(' + [`%s`](%s.m) - %s  ', tmp{1}, tmp{1}, tmp{2}), newline];
     end
     fprintf(1,'\b\b\b\b\b%03d%%\n', round(ii*100/N));
 end
