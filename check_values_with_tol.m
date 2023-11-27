@@ -4,24 +4,48 @@ function Y = check_values_with_tol(X, options)
 % Syntax:
 %   Y = utils.check_values_with_tol(X, 'Name', value, ..);
 %
-% Example:
+% Example 1:
 %   rng("default"); % Set random seed for reproducibility
 %   X = cell(1,16);
 %   for iX = 1:numel(X)
 %       X{iX} = randi(randi(1000,1),randi(250,1),1);
 %   end
 %   Y = utils.check_values_with_tol(X);
-%   disp(Y{1}(1:3,:)); % Should give [1 2 1; 1 2 11; 1 2 18];
-%   disp(X{1}(1)); % Should give 104
+%   disp(Y{1}(1:3,:));       % Should give [1 2 1; 1 2 11; 1 2 18];
+%   disp(X{1}(1));           % Should give 104
 %   disp(X{2}([1, 11, 18])); % Should give [108 108 98]   
+%
+% Example 2:
+%   rng("default"); % Set random seed for reproducibility
+%   X = cell(1,16);
+%   for iX = 1:numel(X)
+%       X{iX} = randi(randi(10000,1),randi(1000,1),1);
+%   end
+%   tic;
+%   Y = utils.check_values_with_tol(X, ...
+%           'LeftValueTolerance', 50,  ...
+%           'RightValueTolerance', 50, ...
+%           'ChannelTolerance', 4);
+%   toc; % Runs in ~0.4 seconds
+%   disp(Y{1}(1:3,:));         % Should give [1 2 60; 1 2 70; 1 2 109];
+%   disp(X{1}(1));             % Should give 1035
+%   disp(X{2}([60, 70, 109])); % Should give [1028, 1037, 1068] 
+%   Z = utils.check_values_with_tol(X, ...
+%           'LeftValueTolerance', 5,  ... % Reduce value tolerances
+%           'RightValueTolerance', 5, ...
+%           'ChannelTolerance', 4);
+%   disp(Z{1}(1:3,:));         % Should give [1 2 70; 1 2 314; 1 2 595];
+%   disp(X{1}(1));             % Should give 1035
+%   disp(X{2}([70, 314, 595]); % Should give [1037, 1038, 1035]
 %
 % Inputs:
 %     X cell {mustBeVector} - Cell vector where each cell contains a vector
 %                               of values to compare against all other cells in X.
 %
 % Options:
-%     'LeftTolerance' (1,1) double = 10; % a.u. depends on data units in X
-%     'RightTolerance' (1,1) double = 10; % a.u. depends on data units in X
+%     'ChannelTolerance' (1,1) double = inf; % Can set this to limit the number of "channels away" for a match to be found.     
+%     'LeftValueTolerance' (1,1) double = 10; % a.u. depends on data units in X
+%     'RightValueTolerance' (1,1) double = 10; % a.u. depends on data units in X
 %     'Verbose' (1,1) logical = true;
 %
 % Output:
@@ -37,8 +61,9 @@ function Y = check_values_with_tol(X, options)
 
 arguments
     X cell {mustBeVector}
-    options.LeftTolerance (1,1) double = 10; % a.u. depends on data units in X
-    options.RightTolerance (1,1) double = 10; % a.u. depends on data units in X
+    options.ChannelTolerance (1,1) double {mustBePositive} = inf; % Can set this to limit the number of "channels away" for a match to be found.     
+    options.LeftValueTolerance (1,1) double = 10; % a.u. depends on data units in X
+    options.RightValueTolerance (1,1) double = 10; % a.u. depends on data units in X
     options.Verbose (1,1) logical = true;
 end
 
@@ -53,12 +78,16 @@ Y = cell(size(X));
 if options.Verbose
     n = 0;
     N = numel(x_valid_indices);
-    fprintf(1,'Please wait, checking values with tolerance of [-%6.3f,+%6.3f)...000%%\n', options.LeftTolerance, options.RightTolerance);
+    if isinf(options.ChannelTolerance)
+        fprintf(1,'Please wait, checking values matched on all channels with tolerance of [-%6.3f,+%6.3f)...000%%\n', options.LeftValueTolerance, options.RightValueTolerance);
+    else
+        fprintf(1,'Please wait, checking values matched within channel-groups of %d with tolerance of [-%6.3f,+%6.3f)...000%%\n', options.ChannelTolerance, options.LeftValueTolerance, options.RightValueTolerance);
+    end
 end
 for iX = x_valid_indices
     for ii = 1:numel(X{iX})
-        val = [X{iX}(ii)-options.LeftTolerance, X{iX}(ii)+options.RightTolerance];
-        mask = (all_data(:,1)~=iX) & (all_data(:,3)>=val(1)) & (all_data(:,3)<val(2));
+        val = [X{iX}(ii)-options.LeftValueTolerance, X{iX}(ii)+options.RightValueTolerance];
+        mask = (all_data(:,1) > iX) & (all_data(:,1) <= (iX + options.ChannelTolerance)) & (all_data(:,3)>=val(1)) & (all_data(:,3)<val(2));
         Y{iX} = [Y{iX}; [ones(sum(mask),1).*ii, all_data(mask, 1:2)]];
     end
     if options.Verbose
