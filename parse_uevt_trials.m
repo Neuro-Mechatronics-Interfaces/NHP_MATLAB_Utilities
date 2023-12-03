@@ -24,18 +24,20 @@ SAGA_Block = nan(n,1);
 Target = enum.TaskTarget(-1.*ones(n,1));
 Direction = enum.TaskDirection(-1.*ones(n,1));
 Outcome = enum.TaskOutcome(-1.*ones(n,1));
-Orientation = enum.TaskOrientation(-1.*ones(n,1));
+% Orientation = enum.TaskOrientation(-1.*ones(n,1));
+tmp = strsplit(T.Properties.UserData.Experiment, '_');
+Orientation = repmat(enum.TaskOrientation(tmp{end}),n,1);
 
 i_next = find(T.Event == options.Keyword, 1, 'first');
-i_orientation = find(T.Event(1:i_next) == "Orientation", 1, 'last');
+% i_orientation = find(T.Event(1:i_next) == "Orientation", 1, 'last');
 i_target = find(T.Event(1:i_next) == "Target", 1, 'last');
 i_direction = find(T.Event(1:i_next) == "Direction", 1, 'last');
 i_outcome = find(T.Event(1:i_next) =="Outcome", 1, 'last');
 
 
-if ~isempty(i_orientation)
-    Orientation(1) = enum.TaskOrientation(T.Data(i_orientation));
-end
+% if ~isempty(i_orientation)
+%     Orientation(1) = enum.TaskOrientation(T.Data(i_orientation));
+% end
 if ~isempty(i_target)
     Target(1) = enum.TaskTarget(T.Data(i_target));
 end
@@ -52,15 +54,15 @@ for ii = 1:(n-1)
     if isempty(i_next)
         i_next = size(T,1);
     end
-    i_orientation = find(T.Event(1:i_next) == "Orientation", 1, 'last');
+%     i_orientation = find(T.Event(1:i_next) == "Orientation", 1, 'last');
     i_target = find(T.Event(1:i_next) == "Target", 1, 'last');
     i_direction = find(T.Event(1:i_next) == "Direction", 1, 'last');
     i_outcome = find(T.Event(1:i_next) =="Outcome", 1, 'last');
-    if ~isempty(i_orientation)
-        Orientation(ii+1) = enum.TaskOrientation(T.Data(i_orientation));
-    else
-        Orientation(ii+1) = Orientation(ii);
-    end
+%     if ~isempty(i_orientation)
+%         Orientation(ii+1) = enum.TaskOrientation(T.Data(i_orientation));
+%     else
+%         Orientation(ii+1) = Orientation(ii);
+%     end
     if ~isempty(i_target)
         Target(ii+1) = enum.TaskTarget(T.Data(i_target));
     else

@@ -22,13 +22,18 @@ function s = print_timing_info(maintic, function_name)
 %
 % See also: Contents, tic, mfilename
 
+arguments
+    maintic (1,1) uint64
+    function_name {mustBeTextScalar} = ""
+end
+
 total = seconds(toc(maintic));
 
 H = floor(hours(total));
 M = floor(minutes(total - hours(H)));
 S = round(seconds(total - (hours(H) + minutes(M))), 2);
 
-if nargin > 1
+if strlength(function_name) > 0
     s = sprintf('\t->\t<strong>%3d h :: %2d m :: %4.2f s</strong> elapsed (<strong>%s</strong>)\n', H, M, S, function_name); 
 else
     s = sprintf('\t->\t<strong>%3d h :: %2d m :: %4.2f s</strong> elapsed\n', H, M, S); 
