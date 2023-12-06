@@ -83,6 +83,24 @@ for iF = 1:numel(F)
             fprintf(1,'complete.\n');
         end
     end
+    S = dir(fullfile(options.LocalTMSiFolder, subj, sprintf('%s_%s_%s_%s_WAGGLE_*.mat',subj,yyyy,mm,dd)));
+    if numel(S) > 0
+        for iS = 1:numel(S)
+            fprintf(1,'Moving TMSI-WAGGLE FILE: <strong>%s</strong>...', S(iS).name);
+            copyfile(fullfile(S(iS).folder,S(iS).name), fullfile(outfolder_root, S(iS).name));
+            delete(fullfile(S(iS).folder,S(iS).name));
+            fprintf(1,'complete.\n');
+        end
+    end
+    S = dir(fullfile(options.LocalTMSiFolder, subj, sprintf('%s_%s_%s_%s_EXIT_*.mat',subj,yyyy,mm,dd)));
+    if numel(S) > 0
+        for iS = 1:numel(S)
+            fprintf(1,'Moving TMSI-EXIT FILE: <strong>%s</strong>...', S(iS).name);
+            copyfile(fullfile(S(iS).folder,S(iS).name), fullfile(outfolder_root, S(iS).name));
+            delete(fullfile(S(iS).folder,S(iS).name));
+            fprintf(1,'complete.\n');
+        end
+    end
 %     % 5. Copy the TREC files over to remote (.csv)
 %     T = dir(fullfile(options.LocalTRecFolder, '*Position.csv'));
 %     if numel(T) > 0
