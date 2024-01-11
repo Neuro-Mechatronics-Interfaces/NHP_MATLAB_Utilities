@@ -11,14 +11,15 @@ function transfer_plexon_files(options)
 %     options.EventExtension {mustBeTextScalar} = '.uevt'
 %     options.RemoteFolderRoot {mustBeTextScalar,mustBeFolder} = "R:/NMLShare/raw_data/primate";
 %
-% See also: Contents, TASK_CreateUDPClient (Plexon_Tools/Online)
+% See also: Contents, utils.transfer_uevt_files, TASK_CreateUDPClient (Plexon_Tools/Online)
 arguments
     options.LocalEventFolder {mustBeTextScalar, mustBeFolder} = fullfile(pwd, 'logs')
     options.LocalPlexonFolder {mustBeTextScalar, mustBeFolder} = "D:/PlexonData"
     options.LocalTMSiFolder {mustBeTextScalar, mustBeFolder} = "D:/TMSi/MATLAB/raw_data"
-    options.LocalTRecFolder {mustBeTextScalar, mustBeFolder} = "D:/TREC/Logs/Position"
     options.EventExtension {mustBeTextScalar} = '.uevt'
-    options.RemoteFolderRoot {mustBeTextScalar,mustBeFolder} = "R:/NMLShare/raw_data/primate";
+%     options.RemoteFolderRoot {mustBeTextScalar,mustBeFolder} = "R:/NMLShare/raw_data/primate"; % (As of 2024-01-09, no longer connects via Wired and Wireless is really slow, so needed to change) 
+    options.RemoteFolderRoot {mustBeTextScalar,mustBeFolder} = "H:/raw_data"; % "HP_Shared" local datashare (LAN Ethernet)
+    options.RemoteFolderSubfolder cell = {'Recordings'};
 end
 
 fclose("all");
@@ -34,7 +35,7 @@ for iF = 1:numel(F)
     dd = f_parts{4};
     ornt = f_parts{5};
     tank = sprintf('%s_%s_%s_%s', subj, yyyy, mm, dd);
-    outfolder_root = fullfile(options.RemoteFolderRoot, subj, tank);
+    outfolder_root = fullfile(options.RemoteFolderRoot, subj, options.RemoteFolderSubfolder{:}, tank);
     if exist(outfolder_root, 'dir')==0
         mkdir(outfolder_root);
     end
@@ -101,20 +102,6 @@ for iF = 1:numel(F)
             fprintf(1,'complete.\n');
         end
     end
-%     % 5. Copy the TREC files over to remote (.csv)
-%     T = dir(fullfile(options.LocalTRecFolder, '*Position.csv'));
-%     if numel(T) > 0
-%         outfolder_trec = fullfile(outfolder_root, sprintf('%s_TREC', tank));
-%         if exist(outfolder_trec, 'dir')==0
-%             mkdir(outfolder_trec);
-%         end
-%         for iT = 1:numel(T)
-%             fprintf(1,'Moving TREC FILE: <strong>%s</strong>...', T(iT).name);
-%             copyfile(fullfile(T(iT).folder,T(iT).name), fullfile(outfolder_trec, T(iT).name));
-%             delete(fullfile(T(iT).folder,T(iT).name));
-%             fprintf(1,'complete.\n');
-%         end
-%     end
 end
 
 end
