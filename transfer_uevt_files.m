@@ -14,7 +14,7 @@ arguments
     options.LocalEventFolder {mustBeTextScalar, mustBeFolder} = fullfile(pwd, 'logs');
     options.EventExtension {mustBeTextScalar} = '.uevt';
     options.RemoteFolderRoot {mustBeTextScalar,mustBeFolder} = "R:/NMLShare/raw_data/primate"; % (Because .uevt files are small, this is fine since it is easy to transfer directly to the remote datashare despite slow Wi-Fi connection on Plexon rig computer) 
-    options.RemoteFolderSubfolder cell = {'Recordings'};
+    options.RemoteFolderSubfolder cell = {};
 end
 
 fclose("all");
@@ -40,7 +40,7 @@ for iF = 1:numel(F)
     if exist(outfolder_events, 'dir')==0
         mkdir(outfolder_events);
     end
-    fprintf(1,'Moving EVENT FILE: <strong>%s</strong>...', F(iF).name);
+    fprintf(1,'Moving EVENT FILE: %s...', F(iF).name);
     copyfile(fullfile(F(iF).folder, F(iF).name), fullfile(outfolder_events, sprintf('%s_%s_%s_%s_%s.uevt', subj, yyyy, mm, dd, ornt)));
     delete(fullfile(F(iF).folder, F(iF).name));
     fprintf(1,'complete.\n');
