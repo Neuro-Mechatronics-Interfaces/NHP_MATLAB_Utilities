@@ -9,6 +9,7 @@ function [h0,stats] = MBoxtest(X,alpha,options)
 %      alpha - significance level (default = 0.05).
 %   
 %     Options:
+%       'ConditioningLevel' (1,1) double = 1e-8; % Adds conditioning noise with specified level to the data, to ensure positive definite covariance.
 %       'Verbose' (1,1) logical = true; % Set false to suppress Command Window print statements.
 %
 %     Output:
@@ -86,48 +87,84 @@ function [h0,stats] = MBoxtest(X,alpha,options)
 arguments
     X (:,:) double
     alpha (1,1) double {mustBeInRange(alpha,0,1)} = 0.05
+    options.RandomSeed (1,1) {mustBeInteger} = 1234; % Ensures the same result when conditioning noise is added.
+    options.ConditioningLevel (1,1) double = 1e-6; % Noise level should be lower than expected signals by a few orders of magnitude. Prevents negative determinant on pooled covariance matrix. Set this value to 0 if you want no conditioning noise added.
+    options.PlotScatter (1,1) logical = true;
+    options.ScatterEigenThreshold (1,1) {mustBeInRange(options.ScatterEigenThreshold,0,100)} = 75;
     options.Verbose (1,1) logical = true;
 end
-g = max(X(:,1)); %Number of groups.
+RandStream('threefry4x64_20','Seed',options.RandomSeed);
+
+G = findgroups(X(:,1));
+[N,c] = size(X);
+p = c - 1;
+X = X(:,2:c) + randn(N,c-1)*options.ConditioningLevel;
+g = max(G); %Number of groups.
 
 n = nan(1,g);
 Xg = cell(1,g);
-for i = 1:g
-    Xg{i}=X(X(:,1)==i,2);
-    n(i)=length(Xg{i});
+if options.PlotScatter
+    fig = figure('Name', 'MBoxTest Scatter Plot','Color','w');
+    ax = axes(fig,'NextPlot','add','FontName','Tahoma');
 end
-
-[~,c] = size(X);
-X = X(:,2:c);
-
-[~,p]=size(X);
 band=2;
-for k=1:g
+for k = 1:g
+    Xg{k}=X(G==k,2:end);
+    n(k)=size(Xg{k},1);
+    if options.PlotScatter
+        [~,score,~,~,explained] = pca(Xg{k});
+        if k == 1
+            cs = cumsum(explained);
+            eig1 = find(cs > options.ScatterEigenThreshold,1,'first');
+            eig2 = eig1+1;
+
+        end
+        scatter(ax,score(:,eig1),score(:,eig2), ...
+            'filled','MarkerEdgeColor','none','MarkerFaceAlpha',0.35,...
+            'DisplayName',sprintf('Group-%d',k));
+    end
     if n(k)>=20
         band=1;
     end
 end
+if options.PlotScatter
+    legend(ax,'Location','eastoutside');
+    xlabel(ax,sprintf("Eig-%d Projection",eig1),'FontName','Tahoma','Color','k');
+    ylabel(ax,sprintf("Eig-%d Projection",eig2),'FontName','Tahoma',"Color",'k');
+end
+
 %Partition of the group covariance matrices.
 S = cell(g,1);
 for k=1:g
-    S{k} = cov(Xg{k});
-end
+    % S{k} = cov(Xg{k});
+    S{k} = (Xg{k}' * Xg{k}) ./ (n(k) - 1);
+    % S{k} = Xg{k}' * Xg{k};
+    % test = cov(Xg{k});
+    % fprintf(1,'Frobenius norm Group-%d = %7.2f\n',k,norm(S{k},"fro")-norm(test,"fro"));
+end 
+S = cat(3,S{:});
 
-deno=sum(n)-g;
-pooled_covariance=zeros(size(S{1}));
+deno=N-g;
+% Sp = cov(X(:,2:end));
+Sp = sum(pagemtimes(S,reshape(n-1,1,1,g)),3)./deno;
 
+% Compute determinants
+Sk_det = nan(1,g);
 for k=1:g
-    pooled_covariance = pooled_covariance + (n(k)-1)*S{k};
+    Sk_det(k) = det(S(:,:,k));
+    if Sk_det < 0
+        warning("Determinant of covariance for group %d is less than zero!", k);
+    end
+end
+Sp_det = det(Sp);
+if Sp_det < 0
+    warning("Negative determinant (%11.1f) of pooled covariance.",det(Sp));
 end
 
-Sp=pooled_covariance/deno;  %Pooled covariance matrix.
-err=0;
+% % % Compute un-adjusted test statistic % % %
+% M = (N - g)*log|S| - ∑(n_k - 1) * log|S_k|
+MBox=deno*log(Sp_det) - sum(log(Sk_det).*(n-1));  %Box's M statistic.
 
-for k=1:g
-    err = err + ((n(k)-1)*log(det(S{k})));
-end
-
-MBox=(sum(n)-g)*log(det(Sp))-err;  %Box's M statistic.
 sum_a=sum(1./(n(1:g)-1));
 sum_b=sum(1./((n(1:g)-1).^2));
 C=(((2*p^2)+(3*p)-1)/(6*(p+1)*(g-1)))*(sum_a-(1/deno));  %Computing of correction factor.
@@ -197,6 +234,14 @@ else
         stats = struct('MBox', MBox, 'F', F2, 'df1', v1, 'df2',v22, 'p',  P2);
         h0 = P2 >= alpha;
     end
+end
+if options.PlotScatter
+    if h0
+        title(ax,sprintf("Same Covariance (p \\geq \\alpha=%0.4f)",alpha),'Color','b','FontName','Tahoma');
+    else
+        title(ax,sprintf("Different Covariance (p < \\alpha=%0.4f)",alpha),'FontName','Tahoma','Color','r');
+    end
+    subtitle(ax,sprintf('Min: %5.1f%% Variance Excluded',options.ScatterEigenThreshold),'FontName',"Tahoma",'Color',[0.65 0.65 0.65]);
 end
 
 end
