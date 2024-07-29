@@ -67,10 +67,14 @@ for ii = 1:numel(options.ExportAs)
     try
         saveas(fig, fullfile(output_folder, options.SubFolders{:}, sprintf('%s%s', name_stem, options.ExportAs{ii})));
     catch
-        if ismember(options.ExportAs{ii},{'.emf','.eps','.pdf'})
-            exportgraphics(fig, fullfile(output_folder, options.SubFolders{:}, sprintf('%s%s', name_stem, options.ExportAs{ii})), 'ContentType', 'vector', 'Resolution', 600);
-        else
-            exportgraphics(fig, fullfile(output_folder, options.SubFolders{:}, sprintf('%s%s', name_stem, options.ExportAs{ii})));
+        try
+            if ismember(options.ExportAs{ii},{'.emf','.eps','.pdf'})
+                exportgraphics(fig, fullfile(output_folder, options.SubFolders{:}, sprintf('%s%s', name_stem, options.ExportAs{ii})), 'ContentType', 'vector', 'Resolution', 600);
+            else
+                exportgraphics(fig, fullfile(output_folder, options.SubFolders{:}, sprintf('%s%s', name_stem, options.ExportAs{ii})));
+            end
+        catch
+            exportapp(fig, fullfile(output_folder, options.SubFolders{:}, sprintf('%s%s', name_stem, options.ExportAs{ii})));
         end
     end
 end
