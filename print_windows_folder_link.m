@@ -35,15 +35,23 @@ if numel(tag) ~= numel(f)
 end
 
 if nargout > 0
-    s = strings(size(f));
-    for ii = 1:numel(f)
-        s(ii) = sprintf('\n<a href="matlab:winopen(''%s'');">%d. %s<\/a>\\n', ...
-            f(ii), ii, tag(ii));
+    if isscalar(f)
+        s = string(sprintf('<a href="matlab:winopen(''%s'');">%s</a>', f, tag));
+    else
+        s = strings(size(f));
+        for ii = 1:numel(f)
+            s(ii) = sprintf('\n<a href="matlab:winopen(''%s'');">%d. %s</a>\n', ...
+                f(ii), ii, tag(ii));
+        end
     end
 else
-    for ii = 1:numel(f)
-        fprintf(1, '<a href="matlab:winopen(''%s'');">%d. %s</a>\n', ...
-            f(ii), ii, tag(ii));
+    if isscalar(f)
+        fprintf(1, '<a href="matlab:winopen(''%s'');">%s</a>\n', f, tag);
+    else
+        for ii = 1:numel(f)
+            fprintf(1, '<a href="matlab:winopen(''%s'');">%d. %s</a>\n', ...
+                f(ii), ii, tag(ii));
+        end
     end
     s = []; %#ok<NASGU>
     clear s;
