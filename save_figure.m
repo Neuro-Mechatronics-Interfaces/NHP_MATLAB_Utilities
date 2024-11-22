@@ -73,8 +73,14 @@ for ii = 1:numel(options.ExportAs)
             else
                 exportgraphics(fig, fullfile(output_folder, options.SubFolders{:}, sprintf('%s%s', name_stem, options.ExportAs{ii})));
             end
-        catch
-            exportapp(fig, fullfile(output_folder, options.SubFolders{:}, sprintf('%s%s', name_stem, options.ExportAs{ii})));
+        catch me
+            try
+                exportapp(fig, fullfile(output_folder, options.SubFolders{:}, sprintf('%s%s', name_stem, options.ExportAs{ii})));
+            catch me2
+                fprintf(1,'Original error:\n');
+                disp(me);
+                rethrow(me2);
+            end
         end
     end
 end
