@@ -3,7 +3,7 @@ function print_tree(options)
 %
 % Options:
 %   'Start': The starting folder for parsing tree path.
-%   'OutputFile': Output file. Default: prints to Command Window.
+%   'OutputFile': Output file (*.txt). Default: prints to Command Window.
 %   'Root': Path for relative indentation. Default: same as Start.
 %   'MaxDepth': Max recursion depth. Default: inf.
 %   'FileFilter': Wildcard pattern for files. Default: '*.*'
@@ -12,6 +12,7 @@ function print_tree(options)
 %   'FolderSizeLim': [minBytes maxBytes], size filter on folders (in GB)
 
 arguments
+    options.ClearCache (1,1) logical = false;
     options.Start {mustBeTextScalar} = pwd;
     options.OutputFile {mustBeTextScalar} = "";
     options.Root {mustBeTextScalar} = "";
@@ -26,6 +27,9 @@ arguments
 end
 
 outfile = options.OutputFile;
+[p,f,~] = fileparts(outfile);
+outfile = fullfile(p, sprintf('%s.txt', f));
+
 startpath = options.Start;
 
 printFile = strlength(outfile) > 0;
@@ -65,12 +69,13 @@ end
 folderFilterParts = split(regexprep(options.FolderFilter, '\\', '/'), '/');
 folderSizeLimInBytes = options.FolderSizeLim * (1024^3);
 
-clear get_folder_size
+if options.ClearCache
+    clear get_folder_size
+end
 write_tree(startpath, fid, numel(relative_parts), options.MaxDepth, ...
     options.FileFilter, folderFilterParts, options.PrintFolderSize, ...
-    options.SortBy, options.PrintFiles,  ...
-    folderSizeLimInBytes, options.FolderFileCountLim);
-
+    folderSizeLimInBytes, options.FolderFileCountLim, ...
+    options.SortBy, options.PrintFiles);
 
 if printFile
     fclose(fid);
@@ -80,7 +85,7 @@ end
     function write_tree(path, fid, base_level, max_levels, fileFilter, ...
         folderFilterParts, showSize, sizeLimits, countLimits, sortBy, ...
         printFiles, progBase, progWidth)
-
+        %WRITE_TREE Recursive function to write nested tree structure to Command Window or text file.
         d_all = dir(path);
         d_all = d_all(~startsWith({d_all.name}, '.'));
 
