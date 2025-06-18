@@ -77,9 +77,20 @@ for ii = 1:numel(options.ExportAs)
             try
                 exportapp(fig, fullfile(output_folder, options.SubFolders{:}, sprintf('%s%s', name_stem, options.ExportAs{ii})));
             catch me2
-                fprintf(1,'Original error:\n');
-                disp(me);
-                rethrow(me2);
+                try 
+                    if strcmpi(options.ExportAs{ii},'.svg')
+                        exportgraphics(fig, fullfile(output_folder, options.SubFolders{:}, sprintf('%s.eps', name_stem)), 'BackgroundColor','none','ContentType','vector');
+                    else
+                        fprintf(1,'Original error:\n');
+                        disp(me);
+                        rethrow(me2);
+                    end
+                catch me3
+                    fprintf(1,'Original errors:\n');
+                    disp(me);
+                    disp(me2);
+                    rethrow(me3);
+                end
             end
         end
     end
