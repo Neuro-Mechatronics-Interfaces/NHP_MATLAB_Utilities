@@ -1,15 +1,44 @@
 function print_tree(options)
-%PRINT_TREE Create a tree-like directory structure printout.
+%PRINT_TREE Recursively prints a visual directory tree with file and folder stats.
 %
-% Options:
-%   'Start': The starting folder for parsing tree path.
-%   'OutputFile': Output file (*.txt). Default: prints to Command Window.
-%   'Root': Path for relative indentation. Default: same as Start.
-%   'MaxDepth': Max recursion depth. Default: inf.
-%   'FileFilter': Wildcard pattern for files. Default: '*.*'
-%   'FolderFilter': Slash-delimited per-level wildcard (e.g. '*/Data')
-%   'PrintFolderSize': Logical, if true appends folder size to printout
-%   'FolderSizeLim': [minBytes maxBytes], size filter on folders (in GB)
+% Syntax:
+%   print_tree(options)
+%
+% Description:
+%   Recursively traverses a folder structure starting at the given root,
+%   printing a tree-like hierarchy of folders and (optionally) files.
+%   Allows filtering, sorting, and size reporting. Output can be printed
+%   to the Command Window or written to a text file.
+%
+% Options (Name-Value Pairs in `options` struct):
+%   Start                - (string) Starting path for tree traversal. Default: `pwd`
+%   OutputFile           - (string) If non-empty, saves output to a UTF-8 .txt file.
+%   Root                 - (string) Path to define relative indentation. Default: same as Start.
+%   MaxDepth             - (positive scalar) Max folder depth. Default: `inf`
+%   FileFilter           - (string) Wildcard pattern for files. Default: `'*.*'`
+%   FolderFilter         - (string) Slash-delimited wildcard for folders by level (e.g., '*/Data')
+%   PrintFolderSize      - (logical) If true, appends size and file count for folders.
+%   PrintFiles           - (logical) If true, includes file names in tree output.
+%   FolderSizeLim        - ([min max] double) Min/max size in **gigabytes** to show folders.
+%   FolderFileCountLim   - ([min max] double) Min/max total file counts for shown folders.
+%   SortBy               - (string) One of `'FolderSize'`, `'FileCount'`, or `'None'`. Sort order for subfolders.
+%   ClearCache           - (logical) If true, clears internal size cache for fresh computation.
+%
+% Notes:
+%   - Sizes are displayed in human-readable units (B, KB, MB, GB).
+%   - Relative folder indentation is computed from Root, if specified.
+%   - Uses persistent caching of folder sizes unless 'ClearCache' is true.
+%
+% Example:
+%   print_tree(struct( ...
+%       'Start', 'C:\MyProject', ...
+%       'OutputFile', 'tree_output.txt', ...
+%       'MaxDepth', 3, ...
+%       'PrintFolderSize', true, ...
+%       'SortBy', 'FileCount' ...
+%   ));
+%
+% See also: dir, fullfile, containers.Map
 
 arguments
     options.ClearCache (1,1) logical = false;
