@@ -47,7 +47,9 @@ arguments
     options.Root {mustBeTextScalar} = "";
     options.MaxDepth {mustBePositive} = inf;
     options.FileFilter {mustBeTextScalar} = "*.*";
+    options.FileExcluder (1,:) = strings(1,0);
     options.FolderFilter {mustBeTextScalar} = "*";
+    options.FolderExcluder (1,:) string = strings(1,0);
     options.PrintFolderSize (1,1) logical = true;
     options.PrintFiles (1,1) logical = true;
     options.FolderSizeLim (1,2) double = [-inf, inf];
@@ -130,6 +132,15 @@ end
 
         % Match folder name using wildcard
         keepFolders = cellfun(@(f) ~isempty(regexp(f, wildcard2regexp(pattern), 'once')), folderNames);
+        % Exclude folders based on FolderExcluder
+        if ~isempty(options.FolderExcluder)
+            excludeMatches = false(size(folderNames));
+            for jj = 1:numel(options.FolderExcluder)
+                pat = wildcard2regexp(options.FolderExcluder(jj));
+                excludeMatches = excludeMatches | ~cellfun(@isempty, regexp(folderNames, pat, 'once'));
+            end
+            keepFolders = keepFolders & ~excludeMatches;
+        end
 
         % Apply folder size bounds
         n = numel(dirs);
@@ -209,6 +220,17 @@ end
 
         % Print files
         if printFiles
+            % Apply FileExcluder patterns
+            if ~isempty(options.FileExcluder)
+                fileNames = {files.name};
+                excludeMatches = false(size(fileNames));
+                for jj = 1:numel(options.FileExcluder)
+                    pat = wildcard2regexp(options.FileExcluder(jj));
+                    excludeMatches = excludeMatches | ~cellfun(@isempty, regexp(fileNames, pat, 'once'));
+                end
+                files = files(~excludeMatches);
+            end
+
             for ii = 1:numel(files)
                 is_last = (ii == numel(files));
                 connector = '└── ';
