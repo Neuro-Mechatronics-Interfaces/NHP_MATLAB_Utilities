@@ -58,7 +58,7 @@ if options.ExpandStruct && strcmp(varInfo.class, 'struct') && (prod(varInfo.size
             subBranch = ternary(isLastField, '└── ', '├── ');
             subPrefix = repmat('   ', 1, indentLevel+1);
             fval = val.(fnames{j});
-            fsize = size2str(size(fval));
+            fsize = size2str(fval);
             fclass = class2str(class(fval));
             fprintf(fid, '|%s%s%s [%s %s]\n', subPrefix, subBranch, fnames{j}, fsize, fclass);
             if isstruct(fval)
@@ -66,7 +66,7 @@ if options.ExpandStruct && strcmp(varInfo.class, 'struct') && (prod(varInfo.size
                 for k = 1:numel(fnames_s)
                     subBranch2 = ternary(isLastField, '└── ', '├── ');
                     fval2 = fval.(fnames_s{k});
-                    fsize2 = size2str(size(fval2));
+                    fsize2 = size2str(fval2);
                     fclass2 = class2str(class(fval2));
                     fprintf(fid, '|%s|   %s%s [%s %s]\n',subPrefix, subBranch2, fnames_s{k}, fsize2, fclass2);
                 end
@@ -79,9 +79,24 @@ if options.ExpandStruct && strcmp(varInfo.class, 'struct') && (prod(varInfo.size
 end
 end
 
-function str = size2str(sz)
-str = sprintf('%dx', sz);
-str = str(1:end-1);
+function str = size2str(val)
+
+if isdatetime(val)
+    str = sprintf('%dx1', numel(val));
+else
+    sz = size(val);
+    if isempty(sz)
+        str = '[]';
+    elseif isscalar(sz)
+        str = sprintf('%dx1',sz);
+    else
+        str = sprintf('%dx', sz);
+        str = str(1:end-1); % remove trailing 'x'
+        if strcmpi(str,'0x0')
+            str = 'nTimestamps x 1';
+        end
+    end
+end
 end
 
 function str = class2str(cl)
