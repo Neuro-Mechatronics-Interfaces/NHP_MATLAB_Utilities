@@ -49,11 +49,10 @@ if options.ExpandStruct && strcmp(varInfo.class, 'struct') && (prod(varInfo.size
     try
         s = load(matFilePath, varInfo.name);
         val = s.(varInfo.name);
-        info = structfun(@(x) struct('size', size(x), 'class', class(x)), val, 'UniformOutput', false);
         fnames = fieldnames(val);
         
         for j = 1:numel(fnames)
-            isLastField = (j == numel(info));
+            isLastField = (j == numel(fnames));
 
             subBranch = ternary(isLastField, '└── ', '├── ');
             subPrefix = repmat('   ', 1, indentLevel+1);
@@ -64,7 +63,8 @@ if options.ExpandStruct && strcmp(varInfo.class, 'struct') && (prod(varInfo.size
             if isstruct(fval)
                 fnames_s = fieldnames(fval);
                 for k = 1:numel(fnames_s)
-                    subBranch2 = ternary(isLastField, '└── ', '├── ');
+                    isLastField2 = k == numel(fnames_s);
+                    subBranch2 = ternary(isLastField2, '└── ', '├── ');
                     fval2 = fval.(fnames_s{k});
                     fsize2 = size2str(fval2);
                     fclass2 = class2str(class(fval2));
