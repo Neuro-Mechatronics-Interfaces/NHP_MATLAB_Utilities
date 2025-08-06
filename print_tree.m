@@ -52,6 +52,7 @@ arguments
     options.FolderExcluder (1,:) string = strings(1,0);
     options.PrintFolderSize (1,1) logical = true;
     options.PrintFiles (1,1) logical = true;
+    options.MaxFilesToPrint (1,1) double = inf;
     options.FolderSizeLim (1,2) double = [-inf, inf];
     options.FolderFileCountLim (1,2) double = [-inf, inf];
     options.SortBy {mustBeMember(options.SortBy, {'FolderSize', 'FileCount', 'None'})} = 'FolderSize';
@@ -106,7 +107,7 @@ end
 write_tree(startpath, fid, numel(relative_parts), options.MaxDepth, ...
     options.FileFilter, folderFilterParts, options.PrintFolderSize, ...
     folderSizeLimInBytes, options.FolderFileCountLim, ...
-    options.SortBy, options.PrintFiles);
+    options.SortBy, options.PrintFiles, options.MaxFilesToPrint);
 
 if printFile
     fclose(fid);
@@ -115,7 +116,7 @@ end
 
     function write_tree(path, fid, base_level, max_levels, fileFilter, ...
         folderFilterParts, showSize, sizeLimits, countLimits, sortBy, ...
-        printFiles, progBase, progWidth)
+        printFiles, maxFiles, progBase, progWidth)
         %WRITE_TREE Recursive function to write nested tree structure to Command Window or text file.
         d_all = dir(path);
         d_all = d_all(~startsWith({d_all.name}, '.'));
@@ -182,7 +183,7 @@ end
 
         nDirs = numel(dirs);
 
-        if nargin < 12
+        if nargin < 13
             progBase = 0;
             progWidth = 1;
             if fid ~= 1
@@ -208,7 +209,7 @@ end
             if base_level + 1 <= max_levels
                 write_tree(fullfile(path, sub.name), fid, base_level + 1, max_levels, ...
                     fileFilter, folderFilterParts, showSize, sizeLimits, ...
-                    countLimits, sortBy, printFiles, subProgBase, subProgWidth);
+                    countLimits, sortBy, printFiles, maxFiles, subProgBase, subProgWidth);
             end
 
             % Print progress after each subdir
@@ -231,7 +232,7 @@ end
                 files = files(~excludeMatches);
             end
 
-            for ii = 1:numel(files)
+            for ii = 1:min(numel(files),maxFiles)
                 is_last = (ii == numel(files));
                 connector = '└── ';
                 if ~is_last
