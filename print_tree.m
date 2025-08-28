@@ -1,8 +1,9 @@
-function print_tree(options)
+function print_tree(root, options)
 %PRINT_TREE Recursively prints a visual directory tree with file and folder stats.
 %
 % Syntax:
-%   print_tree(options)
+%   utils.print_tree(root);
+%   utils.print_tree(__,'Name',value,...);
 %
 % Description:
 %   Recursively traverses a folder structure starting at the given root,
@@ -41,6 +42,7 @@ function print_tree(options)
 % See also: dir, fullfile, containers.Map
 
 arguments
+    root {mustBeTextScalar} = "";
     options.ClearCache (1,1) logical = false;
     options.Start {mustBeTextScalar} = pwd;
     options.OutputFile {mustBeTextScalar} = "";
@@ -57,10 +59,21 @@ arguments
     options.FolderFileCountLim (1,2) double = [-inf, inf];
     options.SortBy {mustBeMember(options.SortBy, {'FolderSize', 'FileCount', 'None'})} = 'FolderSize';
 end
-
 outfile = options.OutputFile;
 [p,f,~] = fileparts(outfile);
 outfile = fullfile(p, sprintf('%s.txt', f));
+if strlength(root) > 0
+    if strlength(options.Root) < 1
+        options.Root = root;
+    end
+    if strlength(p) < 1
+        p = root;
+        outfile = fullfile(p, sprintf('%s.txt', f));
+    end
+    if ~strcmpi(fullfile(options.Start),fullfile(root))
+        options.Start = root;
+    end
+end
 
 startpath = options.Start;
 
