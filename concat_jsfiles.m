@@ -1,17 +1,17 @@
-function outPath = concat_mfiles(inFile, options)
-%CONCAT_MFILES Concatenate the text of a target MATLAB file and
-% other files from specified folders/extensions into a single output .m file.
+function outPath = concat_jsfiles(inFile, options)
+%CONCAT_JSFILES Concatenate the text of a target Javascript file and
+% other files from specified folders/extensions into a single output .js file.
 %
-% outPath = utils.concat_mfiles(inFile, Name=Value, ...)
+% outPath = utils.concat_jsfiles(inFile, Name=Value, ...)
 %
 % Required
 %   inFile    - Full filepath to a MATLAB function/script, OR a bare filename.
 %               If no path is included, the file is assumed to reside in pwd.
 %
 % Name-Value options (parsed into `options` via arguments block):
-%   OutputFile                 string    = "_m_.concatenated"
+%   OutputFile                 string    = "_js_.concatenated"
 %   ExtraFolders               string    = string.empty(1,0)  % additional folders to search
-%   Extensions                 string    = ".m"               % which file extensions to include
+%   Extensions                 string    = ".js"               % which file extensions to include
 %   ExplicitIncludeFiles       string   (default is empty; set as (1,:) list of explicit files to include; if set, ignores other folder contents)
 %   IncludeFilesInInputRoot    logical   = true               % include files from inFile's folder
 %   Verbose                    logical   = true
@@ -25,20 +25,6 @@ function outPath = concat_mfiles(inFile, options)
 % Returns
 %   outPath   - Full path to the generated output file.
 %
-% Example
-%   % Minimal (writes to <input-folder>/mFileContents.m):
-%   concat_mfile_contents("myfun.m");
-%
-%   % Custom name placed in the same folder as input file (no path in OutputFile):
-%   concat_mfile_contents("C:\proj\utils\myfun.m", OutputFile="bundle.m");
-%
-%   % Add more folders and extensions:
-%   concat_mfile_contents("myfun.m", ...
-%       ExtraFolders=["src","include"], ...
-%       Extensions=[".m",".mlx",".md"], ...
-%       IncludeFilesInInputRoot=true, ...
-%       Verbose=true);
-%
 % Notes
 %   - Search is non-recursive within each folder.
 %   - If OutputFile includes a path, it’s honored; otherwise it’s placed in
@@ -48,9 +34,9 @@ function outPath = concat_mfiles(inFile, options)
 
 arguments
     inFile (1,1) string
-    options.OutputFile (1,1) string = "_m_.concatenated"
+    options.OutputFile (1,1) string = "_js_.concatenated"
     options.ExtraFolders (1,:) string = string.empty(1,0)
-    options.Extensions (1,:) string = ".m"
+    options.Extensions (1,:) string = ".js"
     options.ExplicitIncludeFiles (1,:) string = strings(1,0);
     options.IncludeFilesInInputRoot (1,1) logical = true
     options.Verbose (1,1) logical = true
@@ -102,8 +88,8 @@ elseif ~isfolder(outDir)
     mkdir(outDir);
 end
 if strlength(outExt) == 0
-    % Ensure .m extension if none given
-    outExt = ".m";
+    % Ensure .js extension if none given
+    outExt = ".js";
 end
 outPath = fullfile(outDir, outName + outExt);
 
@@ -192,7 +178,7 @@ vprint('Done. Output written to: %s\n', outPath);
     function e = ensureDotPrefix(eIn)
         e = string(eIn);
         if e == ""
-            e = ".m";
+            e = ".js";
         elseif ~startsWith(e, ".")
             e = sprintf('.%s',e);
         end
